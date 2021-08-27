@@ -64,7 +64,9 @@ collection_0 =
 
 offset_list = {{0,5,12,17,24},{0,7,12,19,24}}
 
-current_gate = {}
+current_gate_step = {}
+current_interval_step = {}
+current_octave_step = {}
 
 function init()
   clock_id = clock.run(tick)
@@ -76,7 +78,9 @@ function tick()
   clock.sync(1/4)
   step = step + 1
   for i=1,4,1 do
-  current_gate[i] = step % params:get("gate sequence length "..i)
+  current_gate_step[i] = (step % params:get("gate sequence length "..i)) + 1
+  current_interval_step[i] = (step % params:get("interval sequence length "..i)) + 1
+  current_octave_step[i] = (step % params:get("octave sequence length "..i)) + 1
 end
 end
 end
