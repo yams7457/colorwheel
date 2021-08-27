@@ -64,6 +64,8 @@ collection_0 =
 
 offset_list = {{0,5,12,17,24},{0,7,12,19,24}}
 
+current_gate = {}
+
 function init()
   clock_id = clock.run(tick)
   m = midi.connect()
@@ -74,7 +76,7 @@ function tick()
   clock.sync(1/4)
   step = step + 1
   for i 1,4,1 do
-  current_gate_..i = step % gate sequence length ..i
+  current_gate{i} = step % params:get("gate sequence length "..i)
 end
 end
 end
