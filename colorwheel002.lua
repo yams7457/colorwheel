@@ -75,8 +75,8 @@ function tick()
   while true do
   clock.sync(1/4)
   step = step + 1
-  for i 1,4,1 do
-  current_gate{i} = step % params:get("gate sequence length "..i)
+  for i=1,4,1 do
+  current_gate[i] = step % params:get("gate sequence length "..i)
 end
 end
 end
