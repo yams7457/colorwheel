@@ -38,7 +38,7 @@ for i = 1,4,1 do
 
     for j = 1,16,1 do
 
-      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 1 }
+      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 0 }
       params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 7, default = 1 }
       params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 7, default = 1 }
 
@@ -88,14 +88,16 @@ function tick()
   current_gate_step[i] = (step % params:get("gate sequence length "..i)) + 1
   current_interval_step[i] = (step % params:get("interval sequence length "..i)) + 1
   current_octave_step[i] = (step % params:get("octave sequence length "..i)) + 1
+  
   for j = 1,16,1 do
   current_gate[i] = params:get("gate " ..i .." " ..j)
+  if current_gate[i] then
   current_interval[i] [j] = params:get("interval " ..i .." " ..j)
   current_octave[i] [j]= params:get("octave " ..i .." " ..j)
-  current_note[i] = collection_0 [1] [(7 * (params:get("carving " ..i))) + current_interval[i][j] + (12 * current_octave[i][j])]
-    if current_gate[1] then print(current_interval[1][j])
-    end
+  current_note[i] = collection_0 [1] [(7 * (params:get("carving " ..i))) + current_interval[i][current_interval_step[i]] + (12 * current_octave[i][j])]
   end
-end
+  end
+  end
+  print(current_interval[1][current_interval_step[1]])
 end
 end
