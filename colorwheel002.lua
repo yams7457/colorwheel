@@ -39,7 +39,7 @@ for i = 1,4,1 do
     for j = 1,16,1 do
 
       params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..j .." "..i, min = 0, max = 1, default = 1 }
-      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..j .." "..i, min = 1, max = 7, default = 5 }
+      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..j .." "..i, min = 1, max = 7, default = 1 }
       params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..j .." "..i, min = 1, max = 7, default = 1 }
 
     end
@@ -82,12 +82,13 @@ function tick()
   clock.sync(1/4)
   step = step + 1
   for i=1,4,1 do
+  current_interval[i] = {}
   current_gate_step[i] = (step % params:get("gate sequence length "..i)) + 1
   current_interval_step[i] = (step % params:get("interval sequence length "..i)) + 1
   current_octave_step[i] = (step % params:get("octave sequence length "..i)) + 1
   for j = 1,16,1 do
   current_gate[i] = params:get("gate " ..i .." " ..j)
-  current_interval[i] = params:get("interval " ..i .." " ..j)
+  current_interval[i] [j] = params:get("interval " ..i .." " ..j)
   current_octave[i] = params:get("octave " ..i .." " ..j)
 end
   current_note[i] = collection_0 [1] [(7 * (params:get("carving " ..i))) + current_interval[i]] + (12 * current_octave[i])
