@@ -15,7 +15,7 @@ params:add{ type = "number", id = "track active " ..i, name = "track active " ..
 params:add{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 0, max = 5, default = 0 }
 end
 
-  params:add_group("tracks",32)
+  params:add_group("tracks",44)
 
 for i = 1,4,1
   do
@@ -27,20 +27,20 @@ params:add{ type = "number", id = "transposition " ..i, name = "transposition " 
 params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 1, max = 5, default = 1 }
 params:add{ type = "number", id = "probabilities " ..i, name = "probabilities " ..i, min = 1, max = 5, default = 1 }
 params:add{ type = "number", id = "clock channel " ..i, name = "clock channel " ..i, min = 1, max = 4, default = 1 }
-params:add{ type = "number", id = "gate sequence length " ..i, name = "gate sequence length " ..i, min = 1, max = 16, default = 6 }
-params:add{ type = "number", id = "interval sequence length " ..i, name = "interval sequence length " ..i, min = 1, max = 16, default = 6 }
+params:add{ type = "number", id = "gate sequence length " ..i, name = "gate sequence length " ..i, min = 1, max = 16, default = 1 }
+params:add{ type = "number", id = "interval sequence length " ..i, name = "interval sequence length " ..i, min = 1, max = 16, default = 1 }
 params:add{ type = "number", id = "octave sequence length " ..i, name = "octave sequence length " ..i, min = 1, max = 16, default = 6 }
 end
 
-  params:add_group("steps",196)
+  params:add_group("steps",192)
 
-for j = 1,4,1 do
+for i = 1,4,1 do
 
-    for i = 1,16,1 do
+    for j = 1,16,1 do
 
-      params:add{ type = "number", id = "gate " ..j .." "..i, name = "gate " ..j .." "..i, min = 0, max = 1, default = 1 }
-      params:add{ type = "number", id = "interval " ..j .." "..i, name = "interval " ..j .." "..i, min = 1, max = 7, default = 1 }
-      params:add{ type = "number", id = "octave " ..j .." "..i, name = "interval " ..j .." "..i, min = 1, max = 7, default = 1 }
+      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..j .." "..i, min = 0, max = 1, default = 1 }
+      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..j .." "..i, min = 1, max = 7, default = 5 }
+      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..j .." "..i, min = 1, max = 7, default = 1 }
 
     end
 
@@ -67,6 +67,10 @@ offset_list = {{0,5,12,17,24},{0,7,12,19,24}}
 current_gate_step = {}
 current_interval_step = {}
 current_octave_step = {}
+current_gate = {}
+current_interval = {}
+current_octave = {}
+current_note = {}
 
 function init()
   clock_id = clock.run(tick)
@@ -81,6 +85,12 @@ function tick()
   current_gate_step[i] = (step % params:get("gate sequence length "..i)) + 1
   current_interval_step[i] = (step % params:get("interval sequence length "..i)) + 1
   current_octave_step[i] = (step % params:get("octave sequence length "..i)) + 1
+  for j = 1,16,1 do
+  current_gate[i] = params:get("gate " ..i .." " ..j)
+  current_interval[i] = params:get("interval " ..i .." " ..j)
+  current_octave[i] = params:get("octave " ..i .." " ..j)
+end
+  current_note[i] = collection_0 [1] [(7 * (params:get("carving " ..i))) + current_interval[i]] + (12 * current_octave[i])
 end
 end
 end
