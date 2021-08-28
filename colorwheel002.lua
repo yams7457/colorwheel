@@ -38,9 +38,9 @@ for i = 1,4,1 do
 
     for j = 1,16,1 do
 
-      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..j .." "..i, min = 0, max = 1, default = 1 }
-      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..j .." "..i, min = 1, max = 7, default = 1 }
-      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..j .." "..i, min = 1, max = 7, default = 1 }
+      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 1 }
+      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 7, default = 1 }
+      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 7, default = 1 }
 
     end
 
@@ -94,7 +94,7 @@ function tick()
   current_octave[i] [j]= params:get("octave " ..i .." " ..j)
   current_note[i] = collection_0 [1] [(7 * (params:get("carving " ..i))) + current_interval[i][j] + (12 * current_octave[i][j])]
     if current_gate[1] then print(current_interval[1][j])
-  end
+    end
   end
 end
 end
