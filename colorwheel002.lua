@@ -91,7 +91,7 @@ function tick()
   current_interval_step[i] = (current_interval_step[i] ) % params:get("interval sequence length " ..i) + 1
   current_octave_step[i] = (current_octave_step[i] ) % params:get("octave sequence length " ..i)  + 1
   if current_gate_step[i] then
-    current_interval[i] = (collection_0[1 + params:get("transpose")][((params:get("carving " ..i) * 7)) + params:get("interval " ..i .." " ..current_interval_step[i]))]) % 12
+    current_interval[i] = (collection_0[1 + params:get("transpose")][((params:get("carving " ..i) * 7) + params:get("interval " ..i .." " ..current_interval_step[i]))]) % 12
     print(current_interval[i])
     end
   end
