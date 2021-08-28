@@ -22,14 +22,14 @@ for i = 1,4,1
 params:add{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
 params:add{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
 params:add{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 0, max = 5, default = 0 }
-params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = 1 }
-params:add{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = 1, max = 5, default = 1 }
-params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 1, max = 5, default = 5 }
+params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 0, max = 4, default = 2 }
+params:add{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = 0}
+params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 4, default = 4 }
 params:add{ type = "number", id = "probabilities " ..i, name = "probabilities " ..i, min = 1, max = 5, default = 1 }
 params:add{ type = "number", id = "clock channel " ..i, name = "clock channel " ..i, min = 1, max = 4, default = 1 }
-params:add{ type = "number", id = "gate sequence length " ..i, name = "gate sequence length " ..i, min = 1, max = 16, default = 1 }
-params:add{ type = "number", id = "interval sequence length " ..i, name = "interval sequence length " ..i, min = 1, max = 16, default = 1 }
-params:add{ type = "number", id = "octave sequence length " ..i, name = "octave sequence length " ..i, min = 1, max = 16, default = 1 }
+params:add{ type = "number", id = "gate sequence length " ..i, name = "gate sequence length " ..i, min = 1, max = 16, default = math.random (1, 16) }
+params:add{ type = "number", id = "interval sequence length " ..i, name = "interval sequence length " ..i, min = 1, max = 16, default = math.random (1, 16) }
+params:add{ type = "number", id = "octave sequence length " ..i, name = "octave sequence length " ..i, min = 1, max = 16, default = math.random (1, 16) }
 end
 
   params:add_group("steps",192)
@@ -38,9 +38,9 @@ for i = 1,4,1 do
 
     for j = 1,16,1 do
 
-      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 0 }
-      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 7, default = 1 }
-      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 7, default = 1 }
+      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = math.random (0, 1) }
+      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 7, default = math.random (1, 7) }
+      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 7, default = math.random (1, 7) }
 
     end
 
@@ -75,6 +75,11 @@ current_note = {}
 function init()
   clock_id = clock.run(tick)
   m = midi.connect()
+  for i = 1,4,1 do
+  current_gate_step[i] = 0
+  current_interval_step[i] = 0
+  current_octave_step[i] = 0
+end
 end
 
 function tick()
@@ -82,22 +87,13 @@ function tick()
   clock.sync(1)
   step = step + 1
   for i=1,4,1 do
-  current_gate[i] = {}
-  current_interval[i] = {}
-  current_octave[i] = {}
-  current_gate_step[i] = (step % params:get("gate sequence length "..i)) + 1
-  current_interval_step[i] = (step % params:get("interval sequence length "..i)) + 1
-  current_octave_step[i] = (step % params:get("octave sequence length "..i)) + 1
-  
-  for j = 1,16,1 do
-  current_gate[i] = params:get("gate " ..i .." " ..j)
-  if current_gate[i] then
-  current_interval[i] [j] = params:get("interval " ..i .." " ..j)
-  current_octave[i] [j]= params:get("octave " ..i .." " ..j)
-  current_note[i] = collection_0 [1] [(7 * (params:get("carving " ..i))) + current_interval[i][current_interval_step[i]] + (12 * current_octave[i][j])]
+  current_gate_step[i] = (current_gate_step[i]) % params:get("gate sequence length " ..i) + 1
+  current_interval_step[i] = (current_interval_step[i] ) % params:get("interval sequence length " ..i) + 1
+  current_octave_step[i] = (current_octave_step[i] ) % params:get("octave sequence length " ..i)  + 1
+  if current_gate_step[i] then
+    current_interval[i] = (collection_0[1 + params:get("transpose")][((params:get("carving " ..i) * 7)) + params:get("interval " ..i .." " ..current_interval_step[i]))]) % 12
+    print(current_interval[i])
+    end
   end
-  end
-  end
-  print(current_interval[1][current_interval_step[1]])
 end
 end
