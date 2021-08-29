@@ -23,7 +23,7 @@ for i = 1,4,1
 params:add{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
 params:add{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
 params:add{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 0, max = 5, default = 0 }
-params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = 3 }
+params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = 5 }
 params:add{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = 0}
 params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 3, default = 3 }
 params:add{ type = "number", id = "probabilities " ..i, name = "probabilities " ..i, min = 1, max = 5, default = 1 }
@@ -113,8 +113,9 @@ end
 end
 
 function play(note, vel, channel, track)
-  print(note, vel, channel, track)
-  m:note_on(note + 24, vel, channel)
-  clock.sleep(2)
-  m:note_off(note, vel, channel)
+  --print(note, vel, channel, track)
+  m:note_on(note + 36, vel, channel)
+  note_length_clock = clock.run
+  clock.sleep(1/32)
+  m:note_off(note + 36, vel, channel)
   end
