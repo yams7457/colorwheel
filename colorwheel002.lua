@@ -91,10 +91,13 @@ function tick()
   current_gate_step[i] = (current_gate_step[i]) % params:get("gate sequence length " ..i) + 1
   current_interval_step[i] = (current_interval_step[i] ) % params:get("interval sequence length " ..i) + 1
   current_octave_step[i] = (current_octave_step[i] ) % params:get("octave sequence length " ..i)  + 1
-  if current_gate_step[i] then
+if current_gate_step[i] then
     local outer_index = 1 + params:get("transpose")
-    print(params:get("carving " ..i) * 7)
-    local inner_index = ((params:get("carving " ..i) * 7) + params:get("interval " ..i .." " ..current_interval_step[i]))
+    local carving = params:get("carving " ..i) * 7
+    print(carving)
+    local interval = params:get("interval " .. i .. " " .. current_interval_step[i])
+    print(interval)
+    local inner_index = (carving + interval)
     current_inner_index[i] = inner_index
     current_interval[i] = (collection_0[outer_index][inner_index]) % 12
     end
