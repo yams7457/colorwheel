@@ -23,12 +23,12 @@ for i = 1,4,1
 params:add{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
 params:add{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
 params:add{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 0, max = 5, default = 0 }
-params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = 3 }
-params:add{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = 0}
-params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 3, default = 3 }
+params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = math.random(1, 5)}
+params:add{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = math.random(-2, 2)}
+params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 3, default = math.random (0,3) }
 params:add{ type = "number", id = "probabilities " ..i, name = "probabilities " ..i, min = 1, max = 5, default = 1 }
 params:add{ type = "number", id = "clock channel " ..i, name = "clock channel " ..i, min = 1, max = 4, default = 1 }
-params:add{ type = "number", id = "gate sequence length " ..i, name = "gate sequence length " ..i, min = 1, max = 16, default = 1}
+params:add{ type = "number", id = "gate sequence length " ..i, name = "gate sequence length " ..i, min = 1, max = 16, default = math.random(1, 16)}
 params:add{ type = "number", id = "interval sequence length " ..i, name = "interval sequence length " ..i, min = 1, max = 16, default = math.random (1, 16) }
 params:add{ type = "number", id = "octave sequence length " ..i, name = "octave sequence length " ..i, min = 1, max = 16, default = math.random (1, 16) }
 end
@@ -41,7 +41,7 @@ for i = 1,4,1 do
 
       params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 1}
       params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 7, default = math.random (1, 7) }
-      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 7, default = 1 }
+      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 7, default = math.random (2, 4)}
 
     end
 
@@ -114,7 +114,11 @@ end
 
 function play(note, vel, channel, track)
   --print(note, vel, channel, track)
-  m:note_on(note + 36, vel, channel)
-  clock.sync(1/16)
-  m:note_off(note + 36, vel, channel)
-  end
+  m:note_on(note, vel, channel)
+  clock.run(
+    function()
+      clock.sleep(1/16)
+          m:note_off(note, vel, channel)
+end
+)
+end
