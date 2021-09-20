@@ -2,7 +2,7 @@ music_util = require("musicutil")
 
 m = midi.connect()
 
-  params:add_group("meta",18)
+  params:add_group("meta",20)
 
 params:add{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
 params:add{ type = "number", id = "offset", name = "offset", min = 0, max = 11, default = 0 }
