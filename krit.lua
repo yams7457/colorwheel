@@ -1,92 +1,667 @@
+include 'lib/nest/core'
+include 'lib/nest/norns'
+include 'lib/nest/grid'
+
+
 g = grid.connect()
-winning_row = 8
-current_track = 1
-current_page = 6
-pagextrack = {{1,2,3,4},
-              {1,2,3,4},
-              {1,2,3,4},
-              {1,2,3,4},
-              {1,2,3,4},
-              {1,2,3,4},
-              {1,2,3,4}}
-            
 
-function init()
-  grid_dirty = true
-  switch = {}
-  switch_page = {}
-  range = {}
-  future_range = {}
-  for i = 1,16 do
-    switch[i] = {y = 7}
-  end
-  for i = 1,8 do
-    range[i] = {x1 = 1, x2 = 1, held = 0}
-    future_range[i] = {x1 = 1, x2 = 1, held = 0}
-  end
-    clock.run(grid_redraw_clock)
-end
+seqorlive = nest_ {
+    meta = _grid.number {
+      x = {15, 16},
+      y = 8,
+      level = {4, 15}
+},
 
-function grid_redraw_clock()
-  while true do
-      if grid_dirty then
-          grid_redraw()
-          grid_dirty = false
-      end
-      clock.sleep(1/30)
-  end
-end
-
-function grid_redraw()
-  g:all(0)
-  for i = 1, 16 do
-    g:led(i,switch[i].y, 2)
-  end
-  for i = range[winning_row].x1, range[winning_row].x2 do
-    g:led(i,switch[i].y, 9)
-  end
-  for i = 1,4 do
-    g:led(i,8,4)
-  end
-  for i = 6,9 do
-    g:led(i,8,4)
-  end
-  g:led(current_track, 8, 9)
-  g:led(current_page, 8, 9)
-    g:refresh()
-end
-
-function g.key(x,y,z)
-  if z == 1 and y == 8 and 5 < x then
-    current_page = x
-  end
-  if z == 1 and y == 8 and x < 5  then
-    current_track = x
-  end
-  if z == 1 and y < 8 then
-    range[y].held = range[y].held + 1
-    local difference = range[y].x2 - range[y].x1
-    local original = {x1 = range[y].x1, x2 = range[y].x2}
+seq = nest_ {
+    enabled = function(self)
+        return (seqorlive.meta.value == 1)
+    end,
     
-       if range[y].held == 1 then
-          future_range[y].x1 = x
-          move_dot(x,y,z)
+    loop_mod = _grid.momentary {
+        x = 11,
+        y = 8,
+        level = {4, 15 } },
       
+    time_mod = _grid.momentary {
+        x = 12,
+        y = 8,
+        level = {4, 15} },
+      
+    prob_mod = _grid.momentary {
+        x = 13,
+        y = 8,
+        level = {4, 15} },
     
-       elseif range[y].held == 2 then
-          range[y].x1 = future_range[y].x1
-          range[y].x2 = x
-          winning_row = y
-       end
-
-  elseif z == 0 and y < 8 then
-     range[y].held = range[y].held - 1
-     
+    tab = _grid.number {
+        x = {6, 9},
+        y = 8,
+        level = {4, 15} },
   
-  end
-      grid_dirty = true
-end
+    track = _grid.number {
+        x = {1, 4},
+        y = 8,
+        level = {4, 15}
+        },
+      
+    gate_tab = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.seq.tab.value == 1 and
+                    seqorlive.seq.time_mod.value == 0)
+        end,
+        
+        gate_page = nest_ {
+            
+            gatefield = _grid.toggle {
+                x = {1, 16},
+                y = {1, 4},
+                level = {0, 15},
+                fingers = { 0, 0},
+                
+                enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.prob_mod.value == 0)
+                    end,
+    },
+  
+        gate_prob_1 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                
+                enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.track.value == 1 and
+                            seqorlive.seq.prob_mod.value == 1)
+                    end,
+                }end),
+              
+        gate_prob_2 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                
+                enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.track.value == 2 and
+                            seqorlive.seq.prob_mod.value == 1)
+                    end,
+                }end),
+                
+        gate_prob_3 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                
+                enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.track.value == 3 and
+                            seqorlive.seq.prob_mod.value == 1)
+                    end,
+                }end),  
+              
+        gate_prob_4 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                
+                enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.track.value == 4 and
+                            seqorlive.seq.prob_mod.value == 1)
+                    end,
+                }end),  
+              
+        gate_ranges = nest_(4):each(function(i, v)
+    
+            return _grid.range {
+                x = {1, 16},
+                y = i,
+                level = {0, 4},
+                z = 1,
+                
+                enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 1 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.prob_mod.value == 0)
+                    end}end)
+          
+        }},
+                  
+         gate_clocks = nest_(4):each(function(i,v)
+           
+            return _grid.number {
+                x = {1, 16},
+                y = i,
+                level = {0,4},
+              
+            enabled = function(self)
+                return (seqorlive.seq.tab.value == 1 and
+                        seqorlive.seq.loop_mod.value == 0 and 
+                        seqorlive.seq.time_mod.value == 1 and 
+                        seqorlive.seq.prob_mod.value == 0)
+                end}    
+                end)},
+  
+--interval stuff starts here  
+    interval_tab_1 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 2 and 
+                    seqorlive.seq.track.value == 1)
+            end,
+    
+            interval_dots_1 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            interval_prob_1 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+              
+            interval_clock_1 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
 
-function move_dot(x,y,z)
-    switch[x].y = y
-end
+            interval_loop_1 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            }
+          
+        
+  
+        },
+      
+    interval_tab_2 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 2 and 
+                    seqorlive.seq.track.value == 2)
+            end,
+    
+            interval_dots_2 = nest_(16):each(function(i,v)
+          
+                 return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            interval_prob_2 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+              
+            interval_clock_2 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            interval_loop_2 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            }},
+          
+        
+  
+    interval_tab_3 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 2 and 
+                    seqorlive.seq.track.value == 3)
+            end,
+    
+            interval_dots_3 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            interval_prob_3 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+          
+            interval_clock_3 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            interval_loop_3 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            }
+    },
+  
+      interval_tab_4 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 2 and 
+                    seqorlive.seq.track.value == 4)
+            end,
+    
+            interval_dots_4 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            interval_prob_4 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+          
+            interval_clock_4 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            interval_loop_4 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            }
+    },
+  
+--here be octaves
+    octave_tab_1 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 3 and 
+                    seqorlive.seq.track.value == 1)
+            end,
+    
+            octave_dots_1 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {2, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            octave_prob_1 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+          
+            octave_clock_1 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            octave_loop_1 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            },
+            
+            octave_offset_1 = _grid.number {
+                x = {1, 5},
+                y = 1,
+                level = {2, 4},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 0)
+                    end
+            }
+          
+        
+  
+        },
+      
+    octave_tab_2 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 3 and 
+                    seqorlive.seq.track.value == 2)
+            end,
+    
+            octave_dots_2 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {2, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            octave_prob_2 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+          
+            octave_clock_2 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            octave_loop_2 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            },
+            
+            octave_offset_2 = _grid.number {
+                x = {1, 5},
+                y = 1,
+                level = {2, 4},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 0)
+                    end
+            }
+      
+      
+    },
+          
+        
+  
+    octave_tab_3 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 3 and 
+                    seqorlive.seq.track.value == 3)
+            end,
+    
+            octave_dots_3 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {2, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            octave_prob_3 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+          
+            octave_clock_3 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            octave_loop_3 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            },
+            
+            octave_offset_3 = _grid.number {
+                x = {1, 5},
+                y = 1,
+                level = {2, 4},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 0)
+                    end
+            }
+    },
+  
+      octave_tab_4 = nest_ {
+        
+        enabled = function(self)
+            return (seqorlive.meta.value == 1 and
+                    seqorlive.seq.tab.value == 3 and 
+                    seqorlive.seq.track.value == 4)
+            end,
+    
+            octave_dots_4 = nest_(16):each(function(i,v)
+          
+                return _grid.number {
+                    x = i,
+                    y = {2, 5},
+                    level = {0, 4},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 0)
+                        end
+                }end),
+            
+            octave_prob_4 = nest_(16):each(function(i,v)
+    
+          
+                return _grid.number {
+                    x = i,
+                    y = {1, 5},
+                    level = {0, 6},
+                    enabled = function(self)
+                        return (seqorlive.seq.prob_mod.value == 1)
+                        end
+                }end),
+          
+            octave_clock_4 = _grid.number {
+                x = {1, 16},
+                y = 7,
+                level = {0, 4}
+            },
+
+            octave_loop_4 = _grid.range {
+                x = {1, 16},
+                y = 6,
+                level = {0, 4}
+            },
+            
+            octave_offset_4 = _grid.number {
+                x = {1, 5},
+                y = 1,
+                level = {2, 4},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 0)
+                    end
+            }
+    },
+
+--this is all placeholders
+    length_tab = nest_ {
+        enabled = function(self)
+            return (seqorlive.seq.tab.value == 4)
+            end,
+        gate_page_1 = nest_ {
+            enabled = function(self)
+                return (seqorlive.seq.track.value == 1)
+            end,
+            gate_test = _grid.number {
+                x = 4,
+                y = 1,
+                level = {4, 15}
+        }
+    },
+          gate_page_2 = nest_ {
+            enabled = function(self)
+                return (seqorlive.seq.track.value == 2)
+            end,
+            gate_test = _grid.number {
+                x = 4,
+                y = 2,
+                level = {4, 15}
+        }
+        },
+          gate_page_3 = nest_ {
+            enabled = function(self)
+                return (seqorlive.seq.track.value == 3)
+            end,
+            gate_test = _grid.number {
+                x = 4,
+                y = 3,
+                level = {4, 15}
+           }
+        },
+          gate_page_4 = nest_ {
+            enabled = function(self)
+                return (seqorlive.seq.track.value == 4)
+            end,
+            gate_test = _grid.number {
+                x = 4,
+                y = 4,
+                level = {4, 15}       
+                
+        } }
+    } }
+  
+  
+    
+  
+-- if 1 then
+    --gate
+        --mod
+            --track 1
+            --track 2
+            --track 3
+            --track 4
+        --alt
+            --track 1
+            --track 2
+            --track 3
+            --track 4
+    --interval
+        --track 1
+            --mod
+            --alt
+        --track 2
+            --mod
+            --alt
+        --track 3
+            --mod
+            --alt
+        --track 4
+            --mod
+            --alt
+     --octave
+        --track 1
+            --mod
+            --alt
+        --track 2
+            --mod
+            --alt
+        --track 3
+            --mod
+            --alt
+        --track 4
+            --mod
+            --alt  
+    --length
+        --track 1
+            --mod
+            --alt
+        --track 2
+            --mod
+            --alt
+        --track 3
+            --mod
+            --alt
+        --track 4
+            --mod
+            --alt 
+            
+--if 2 then
+    --live shit???
+seqorlive:connect { g = grid.connect() }
+function init() seqorlive:init() end
