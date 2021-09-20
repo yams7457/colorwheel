@@ -2,8 +2,6 @@ music_util = require("musicutil")
 
 m = midi.connect()
 
-include 'krit004'
-
   params:add_group("meta",18)
 
 params:add{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
