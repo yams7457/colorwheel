@@ -1,7 +1,7 @@
 include 'lib/nest/core'
 include 'lib/nest/norns'
 include 'lib/nest/grid'
-
+include 'lib/nest/colorwheel_math'
 
 g = grid.connect()
 
