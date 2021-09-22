@@ -168,7 +168,7 @@ seq = nest_ {
                   
                   controlspec = params:lookup_param('gate 1 ' ..i).controlspec,
                   value = function() return params:get('gate 1 ' ..i) end,
-                  action = function() params:set('gate 1 ' ..i) end,
+                  action = function() params:set('gate 1 ' ..i, v) end,
                 
                   enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and 
@@ -187,7 +187,7 @@ seq = nest_ {
                   
                   controlspec = params:lookup_param('gate 2 ' ..i).controlspec,
                   value = function() return params:get('gate 2 ' ..i) end,
-                  action = function() params:set('gate 2 ' ..i) end,
+                  action = function() params:set('gate 2 ' ..i, v) end,
                 
                   enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and 
@@ -206,7 +206,7 @@ seq = nest_ {
                   
                   controlspec = params:lookup_param('gate 3 ' ..i).controlspec,
                   value = function() return params:get('gate 3 ' ..i) end,
-                  action = function() params:set('gate 3 ' ..i) end,
+                  action = function() params:set('gate 3 ' ..i, v) end,
                 
                   enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and 
@@ -219,13 +219,13 @@ seq = nest_ {
                 return _grid.toggle {
                   x = i,
                   y = 4,
-                  level = 15,
+                  level = {0, 15},
                   edge = 'falling',
                   fingers = 1,
                   
                   controlspec = params:lookup_param('gate 4 ' ..i).controlspec,
                   value = function() return params:get('gate 4 ' ..i) end,
-                  action = function() params:set('gate 4 ' ..i) end,
+                  action = function(s,v) params:set('gate 4 ' ..i, v) end,
                 
                   enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and 
