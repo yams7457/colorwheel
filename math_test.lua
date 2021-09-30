@@ -2,55 +2,78 @@ music_util = require("musicutil")
 
 m = midi.connect()
 
-  params:add_group("meta",18)
-
-params:add{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
-params:add{ type = "number", id = "offset", name = "offset", min = 0, max = 11, default = 0 }
-params:add{ type = "number", id = "transpose", name = "transpose", min = 0, max = 11, default = 0 }
-params:add{ type = "number", id = "offset mode", name = "offset mode", min = 1, max = 2, default = 2 }
-params:add{ type = "number", id = "bernoulli chance", name = "Bernoulli Chance", min = 0, max = 100, default = 50 }
-params:add{ type = "number", id = "track link mode", name = "track link mode", min = 1, max = 3, default = 1 }
-for i = 1,4,1
-  do
-params:add{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
-params:add{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
+-- store params until ready to add to group
+local param_queue = {}
+function queue_add_param(param)
+  param_queue[#param_queue + 1] = param
 end
 
-  params:add_group("tracks",56)
+-- count how many in queue, create group of that size
+-- then actually add the parameters
+function dequeue_param_group(group_name)
+  print("creating group "..group_name.." with "..#param_queue.." params")
+  params:add_group(group_name, #param_queue)
+  print("adding "..#param_queue.." params")
+  for queue_index=1, #param_queue do
+    params:add(param_queue[queue_index])
+  end
+  param_queue = {}
+end
+
+--  params:add_group("meta",18)
+
+queue_add_param{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
+queue_add_param{ type = "number", id = "offset", name = "offset", min = 0, max = 11, default = 0 }
+queue_add_param{ type = "number", id = "transpose", name = "transpose", min = 0, max = 11, default = 0 }
+queue_add_param{ type = "number", id = "offset mode", name = "offset mode", min = 1, max = 2, default = 2 }
+queue_add_param{ type = "number", id = "bernoulli chance", name = "Bernoulli Chance", min = 0, max = 100, default = 50 }
+queue_add_param{ type = "number", id = "track link mode", name = "track link mode", min = 1, max = 3, default = 1 }
+for i = 1,4,1
+  do
+queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
+queue_add_param{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
+end
+  dequeue_param_group("meta")
+
+  --params:add_group("tracks",56)
 
 for i = 1,4,1
   do
-params:add{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
-params:add{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
-params:add{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 1, max = 6, default = i + 1 }
-params:add{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = math.random(2, 4)}
-params:add{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = math.random(-2, 2)}
-params:add{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 3, default = math.random (0,3) }
-params:add{ type = "number", id = "probabilities " ..i, name = "probabilities " ..i, min = 1, max = 5, default = 1 }
-params:add{ type = "number", id = "clock channel " ..i, name = "clock channel " ..i, min = 1, max = 4, default = 1 }
-params:add{ type = "number", id = "gate sequence start " ..i, name = "gate sequence start " ..i, min = 1, max = 16, default = math.random(1, 6)}
-params:add{ type = "number", id = "interval sequence start " ..i, name = "interval sequence start " ..i, min = 1, max = 16, default = math.random(1, 6)}
-params:add{ type = "number", id = "octave sequence start " ..i, name = "octave sequence start " ..i, min = 1, max = 16, default = math.random (1, 6) }
-params:add{ type = "number", id = "gate sequence end " ..i, name = "gate sequence end " ..i, min = 1, max = 16, default = math.random(9, 16)}
-params:add{ type = "number", id = "interval sequence end " ..i, name = "interval sequence end " ..i, min = 1, max = 16, default = math.random(9, 16)}
-params:add{ type = "number", id = "octave sequence end " ..i, name = "octave sequence end " ..i, min = 1, max = 16, default = math.random (9, 16) }
+queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
+queue_add_param{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
+queue_add_param{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 1, max = 6, default = i + 1 }
+queue_add_param{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = math.random(2, 4)}
+queue_add_param{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = math.random(-2, 2)}
+queue_add_param{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 3, default = math.random (0,3) }
+queue_add_param{ type = "number", id = "probabilities " ..i, name = "probabilities " ..i, min = 1, max = 5, default = 1 }
+queue_add_param{ type = "number", id = "clock channel " ..i, name = "clock channel " ..i, min = 1, max = 4, default = 1 }
+queue_add_param{ type = "number", id = "gate sequence start " ..i, name = "gate sequence start " ..i, min = 1, max = 16, default = math.random(1, 6)}
+queue_add_param{ type = "number", id = "interval sequence start " ..i, name = "interval sequence start " ..i, min = 1, max = 16, default = math.random(1, 6)}
+queue_add_param{ type = "number", id = "octave sequence start " ..i, name = "octave sequence start " ..i, min = 1, max = 16, default = math.random (1, 6) }
+queue_add_param{ type = "number", id = "gate sequence end " ..i, name = "gate sequence end " ..i, min = 1, max = 16, default = math.random(9, 16)}
+queue_add_param{ type = "number", id = "interval sequence end " ..i, name = "interval sequence end " ..i, min = 1, max = 16, default = math.random(9, 16)}
+queue_add_param{ type = "number", id = "octave sequence end " ..i, name = "octave sequence end " ..i, min = 1, max = 16, default = math.random (9, 16) }
 
 
 end
 
-  params:add_group("steps",192)
+  dequeue_param_group("tracks")
+
+--  params:add_group("steps",192)
 
 for i = 1,4,1 do
 
     for j = 1,16,1 do
 
-      params:add{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = math.random(0, 1)}
-      params:add{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 5, default = math.random (1, 5) }
-      params:add{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
+      queue_add_param{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = math.random(0, 1)}
+      queue_add_param{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 5, default = math.random (1, 5) }
+      queue_add_param{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
 
     end
 
 end
+
+dequeue_param_group("steps")
 
 step = 0
 
