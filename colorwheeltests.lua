@@ -5,6 +5,10 @@ include 'lib/math'
 
 g = grid.connect()
 
+function init()
+  math.init()
+end
+
 seqorlive = nest_ {
     meta = _grid.number {
       x = {15, 16},
@@ -68,7 +72,7 @@ seq = nest_ {
                     end,
                 
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                 end},
@@ -89,7 +93,7 @@ seq = nest_ {
                     end,
                 
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                     end},
@@ -110,7 +114,7 @@ seq = nest_ {
                     end,
                 
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                 end},
@@ -131,7 +135,7 @@ seq = nest_ {
                     end,
                 
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                     end},
@@ -162,8 +166,7 @@ seq = nest_ {
                 return _grid.toggle {
                   x = i,
                   y = 1,
-                  level = 15,
-                  edge = 'falling',
+                  level = {0, 15},
                   fingers = 1,
                   
                   controlspec = params:lookup_param('gate 1 ' ..i).controlspec,
@@ -181,8 +184,7 @@ seq = nest_ {
                 return _grid.toggle {
                   x = i,
                   y = 2,
-                  level = 15,
-                  edge = 'falling',
+                  level = {0, 15},
                   fingers = 1,
                   
                   controlspec = params:lookup_param('gate 2 ' ..i).controlspec,
@@ -200,7 +202,6 @@ seq = nest_ {
                 return _grid.toggle {
                   x = i,
                   y = 3,
-                  level = 15,
                   edge = 'falling',
                   fingers = 1,
                   
@@ -219,7 +220,6 @@ seq = nest_ {
                 return _grid.toggle {
                   x = i,
                   y = 4,
-                  level = {0, 15},
                   edge = 'falling',
                   fingers = 1,
                   
