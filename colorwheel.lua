@@ -5,6 +5,10 @@ include 'lib/math'
 
 g = grid.connect()
 
+function init()
+  math.init()
+end
+
 seqorlive = nest_ {
     meta = _grid.number {
       x = {15, 16},
@@ -58,8 +62,17 @@ seq = nest_ {
                 z = -1,
                 level = 4,
                 
+                value = function() 
+                    return { params:get('gate sequence start 1'), params:get('gate sequence end 1') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('gate sequence start 1', v[1]) 
+                    params:set('gate sequence end 1', v[2]) 
+                    end,
+                
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                 end},
@@ -70,8 +83,17 @@ seq = nest_ {
                 z = -1,
                 level = 4,
                 
+                value = function() 
+                    return { params:get('gate sequence start 2'), params:get('gate sequence end 2') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('gate sequence start 2', v[1]) 
+                    params:set('gate sequence end 2', v[2]) 
+                    end,
+                
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                     end},
@@ -82,8 +104,17 @@ seq = nest_ {
                 z = -1,
                 level = 4,
                 
+                value = function() 
+                    return { params:get('gate sequence start 3'), params:get('gate sequence end 3') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('gate sequence start 3', v[1]) 
+                    params:set('gate sequence end 3', v[2]) 
+                    end,
+                
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                 end},
@@ -94,41 +125,120 @@ seq = nest_ {
                 z = -1,
                 level = 4,
                 
+                value = function() 
+                    return { params:get('gate sequence start 4'), params:get('gate sequence end 4') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('gate sequence start 4', v[1]) 
+                    params:set('gate sequence end 4', v[2]) 
+                    end,
+                
                 enabled = function(self)
-                    return (seqorlive.seq.loop_mod.value == 0 and 
+                    return (seqorlive.seq.loop_mod.value == 1 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
                     end},
             
-            gatefield_1 = _grid.toggle {
-                x = {1, 16},
-                y = 1,
-                edge = 'falling',
-                fingers = 1 },
-            
-            gatefield_2 = _grid.toggle {
-                x = {1, 16},
-                y = 2,
-                edge = 'falling',
-                fingers = 1 }, 
-            
-            gatefield_3 = _grid.toggle {
-                x = {1, 16},
-                y = 3,
-                edge = 'falling',
-                fingers = 1 },
-            
-            gatefield_4 = _grid.toggle {
-                x = {1, 16},
-                y = 4,
-                edge = 'falling',
-                fingers = 1 },
+            --gatefield_1 = _grid.toggle {
+            --    x = {1, 16},
+              --  y = 1,
+                --level = 15,
+--              --  edge = 'falling',
+--                fingers = 1 },
+--            
+--            gatefield_2 = _grid.toggle {
+--                x = {1, 16},
+--                y = 2,
+--                level = 15,
+--                edge = 'falling',
+--                fingers = 1 }, 
+--            
+--            gatefield_3 = _grid.toggle {
+--                x = {1, 16},
+--                y = 3,
+--                level = 15,
+--                edge = 'falling',
+ --               fingers = 1 },
+  --          
+            gatefield_5 = nest_(16):each(function(i,v)
+              
+                return _grid.toggle {
+                  x = i,
+                  y = 1,
+                  
+                  controlspec = params:lookup_param('gate 1 ' ..i).controlspec,
+                  value = function() return params:get('gate 1 ' ..i) end,
+                  action = function(s,v) params:set('gate 1 ' ..i, v) 
+                    print(params:get('gate 1 1'))
+                    end,
                 
-                enabled = function(self)
+                  enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and 
                             seqorlive.seq.time_mod.value == 0 and 
                             seqorlive.seq.prob_mod.value == 0)
-                    end,
+                  end,}end),
+            
+            gatefield_6 = nest_(16):each(function(i,v)
+              
+                return _grid.toggle {
+                  x = i,
+                  y = 2,
+                  
+                  controlspec = params:lookup_param('gate 2 ' ..i).controlspec,
+                  value = function() return params:get('gate 2 ' ..i) end,
+                  action = function(s,v) params:set('gate 2 ' ..i, v) end,
+                
+                  enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.prob_mod.value == 0)
+                  end,}end),                  
+            
+            gatefield_7 = nest_(16):each(function(i,v)
+              
+                return _grid.toggle {
+                  x = i,
+                  y = 3,
+                  
+                  controlspec = params:lookup_param('gate 3 ' ..i).controlspec,
+                  value = function() return params:get('gate 3 ' ..i) end,
+                  action = function(s,v) params:set('gate 3 ' ..i, v) end,
+                
+                  enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.prob_mod.value == 0)
+                  end,}end),            
+            
+            gatefield_8 = nest_(16):each(function(i,v)
+              
+                return _grid.toggle {
+                  x = i,
+                  y = 4,
+                  
+                  controlspec = params:lookup_param('gate 4 ' ..i).controlspec,
+                  value = function() return params:get('gate 4 ' ..i) end,
+                  action = function(s,v) params:set('gate 4 ' ..i, v) end,
+                
+                  enabled = function(self)
+                    return (seqorlive.seq.loop_mod.value == 0 and 
+                            seqorlive.seq.time_mod.value == 0 and 
+                            seqorlive.seq.prob_mod.value == 0)
+                  end,}end),   
+            
+           -- gatefield_4 = _grid.toggle {
+--                x = {1, 16},
+--                y = {1, 4},
+--                level = 15,
+--                edge = 'falling',
+--                fingers = 1 },
+--                
+--                enabled = function(self)
+--                    return (seqorlive.seq.loop_mod.value == 0 and 
+--                            seqorlive.seq.time_mod.value == 0 and 
+--                            seqorlive.seq.prob_mod.value == 0)
+--                    end,
     },
   
         gate_prob_1 = nest_(16):each(function(i,v)
@@ -255,7 +365,16 @@ seq = nest_ {
             interval_loop_1 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('interval sequence start 1'), params:get('interval sequence end 1') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('interval sequence start 1', v[1]) 
+                    params:set('interval sequence end 1', v[2]) 
+                    end,
             }
           
         
@@ -305,7 +424,16 @@ seq = nest_ {
             interval_loop_2 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('interval sequence start 2'), params:get('interval sequence end 2') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('interval sequence start 2', v[1]) 
+                    params:set('interval sequence end 2', v[2]) 
+                    end,
             }},
           
         
@@ -353,7 +481,16 @@ seq = nest_ {
             interval_loop_3 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('interval sequence start 3'), params:get('interval sequence end 3') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('interval sequence start 3', v[1]) 
+                    params:set('interval sequence end 3', v[2]) 
+                    end,
             }
     },
   
@@ -400,7 +537,16 @@ seq = nest_ {
             interval_loop_4 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('interval sequence start 4'), params:get('interval sequence end 4') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('interval sequence start 4', v[1]) 
+                    params:set('interval sequence end 4', v[2]) 
+                    end,
             }
     },
   
@@ -448,7 +594,18 @@ seq = nest_ {
             octave_loop_1 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('octave sequence start 1'), params:get('octave sequence end 1') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('octave sequence start 1', v[1]) 
+                    params:set('octave sequence end 1', v[2]) 
+                    end,
+                
+                
             },
             
             octave_offset_1 = _grid.number {
@@ -510,7 +667,16 @@ seq = nest_ {
             octave_loop_2 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('octave sequence start 2'), params:get('octave sequence end 2') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('octave sequence start 2', v[1]) 
+                    params:set('octave sequence end 2', v[2]) 
+                    end,
             },
             
             octave_offset_2 = _grid.number {
@@ -573,7 +739,16 @@ seq = nest_ {
             octave_loop_3 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('octave sequence start 3'), params:get('octave sequence end 3') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('octave sequence start 3', v[1]) 
+                    params:set('octave sequence end 3', v[2]) 
+                    end,
             },
             
             octave_offset_3 = _grid.number {
@@ -632,7 +807,16 @@ seq = nest_ {
             octave_loop_4 = _grid.range {
                 x = {1, 16},
                 y = 6,
-                level = {0, 4}
+                level = {0, 4},
+                  
+                value = function() 
+                    return { params:get('octave sequence start 4'), params:get('octave sequence end 4') }
+                    end,
+                
+                action = function(s, v) 
+                    params:set('octave sequence start 4', v[1]) 
+                    params:set('octave sequence end 4', v[2]) 
+                    end,
             },
             
             octave_offset_4 = _grid.number {

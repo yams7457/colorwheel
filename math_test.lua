@@ -20,8 +20,6 @@ function dequeue_param_group(group_name)
   param_queue = {}
 end
 
---  params:add_group("meta",18)
-
 queue_add_param{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
 queue_add_param{ type = "number", id = "offset", name = "offset", min = 0, max = 11, default = 0 }
 queue_add_param{ type = "number", id = "transpose", name = "transpose", min = 0, max = 11, default = 0 }
@@ -35,10 +33,9 @@ queue_add_param{ type = "number", id = "track active " ..i, name = "track active
 end
   dequeue_param_group("meta")
 
-  --params:add_group("tracks",56)
-
 for i = 1,4,1
   do
+queue_add_param{ type = "number", id = "gate div " ..i, name = "gate div " ..i, min = 1, max = 16, default = 2 * math.random (1, 8)}
 queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
 queue_add_param{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
 queue_add_param{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 1, max = 6, default = i + 1 }
@@ -53,13 +50,9 @@ queue_add_param{ type = "number", id = "octave sequence start " ..i, name = "oct
 queue_add_param{ type = "number", id = "gate sequence end " ..i, name = "gate sequence end " ..i, min = 1, max = 16, default = math.random(9, 16)}
 queue_add_param{ type = "number", id = "interval sequence end " ..i, name = "interval sequence end " ..i, min = 1, max = 16, default = math.random(9, 16)}
 queue_add_param{ type = "number", id = "octave sequence end " ..i, name = "octave sequence end " ..i, min = 1, max = 16, default = math.random (9, 16) }
-
-
 end
 
   dequeue_param_group("tracks")
-
---  params:add_group("steps",192)
 
 for i = 1,4,1 do
 
@@ -116,32 +109,32 @@ end
 
 function tick()
   while true do
-  clock.sync(1/2)
-  step = step + 1
-  local current_inner_index = {}
-  local current_octave = {}
-  local current_offset = {}
-  for i=1,4,1 do
-  current_gate_step[i] = (((current_gate_step[i]) % (params:get("gate sequence end " ..i))) - (params:get("gate sequence start " ..i))) 
-  + 1 + (params:get("gate sequence start " ..i))
-  current_interval_step[i] = (((current_interval_step[i]) % (params:get("interval sequence end " ..i))) - (params:get("interval sequence start " ..i))) + 1 + (params:get("interval sequence start " ..i))
-  current_octave_step[i] = (((current_octave_step[i]) % (params:get("octave sequence end " ..i))) - (params:get("octave sequence start " ..i))) + 1 + (params:get("octave sequence start " ..i))
-    local outer_index = 1 + params:get("transpose")
-    local carving = params:get("carving " ..i) * 7
-    local interval = params:get("interval " .. i .. " " .. current_interval_step[i])
-    local inner_index = (carving + interval)
-    current_inner_index[i] = inner_index
-    current_interval[i] = params:get("offset") + ((collection_0[outer_index][inner_index] + 24) + ( 7 * params:get("transposition " ..i))) % 12
-    current_octave[i] = (params:get("track octave " ..i) + params:get("octave " ..i .. " " .. current_octave_step[i])) * 12
-    current_offset[i] = offset_list[params:get("offset mode")][params:get("offset " ..i)]
-    current_note[i] = current_interval[i] + current_octave[i] + current_offset[i]
-    current_channel[i] = params:get("midi channel " ..i)
-    play(current_note[i], math.random(60, 127) - current_note[i], current_channel[i], 1)
-    print ('things are happening')
+    clock.sync(1/2)
+    step = step + 1
+    local current_inner_index = {}
+    local current_octave = {}
+    local current_offset = {}
+    for i=1,4,1 do
+    current_gate_step[i] = (((current_gate_step[i]) % (params:get("gate sequence end " ..i))) - (params:get("gate sequence start " ..i))) 
+    + 1 + (params:get("gate sequence start " ..i))
+    current_interval_step[i] = (((current_interval_step[i]) % (params:get("interval sequence end " ..i))) - (params:get("interval sequence start " ..i))) + 1 + (params:get("interval sequence start " ..i))
+    current_octave_step[i] = (((current_octave_step[i]) % (params:get("octave sequence end " ..i))) - (params:get("octave sequence start " ..i))) + 1 + (params:get("octave sequence start " ..i))
+      local outer_index = 1 + params:get("transpose")
+      local carving = params:get("carving " ..i) * 7
+      local interval = params:get("interval " .. i .. " " .. current_interval_step[i])
+      local inner_index = (carving + interval)
+      current_inner_index[i] = inner_index
+      current_interval[i] = params:get("offset") + ((collection_0[outer_index][inner_index] + 24) + ( 7 * params:get("transposition " ..i))) % 12
+      current_octave[i] = (params:get("track octave " ..i) + params:get("octave " ..i .. " " .. current_octave_step[i])) * 12
+      current_offset[i] = offset_list[params:get("offset mode")][params:get("offset " ..i)]
+      current_note[i] = current_interval[i] + current_octave[i] + current_offset[i]
+      current_channel[i] = params:get("midi channel " ..i)
+      play(current_note[i], math.random(60, 127) - current_note[i], current_channel[i], 1)
+      print ('things are happening')
 
   end
-end
-end
+  end
+  end
 
 function play(note, vel, channel, track)
   --print(note, vel, channel, track)
