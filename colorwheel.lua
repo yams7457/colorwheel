@@ -1482,7 +1482,7 @@ octave_transport_2 = my_lattice:new_pattern{
         end
 
         end,
-      division = 1 / 32
+      division = 1 / 16
     }
 
   meta_counter = 0
