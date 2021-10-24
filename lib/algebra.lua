@@ -225,23 +225,23 @@ end
       local interval = params:get("interval " .. i .. " " .. params:get("current interval step " ..i))
       local inner_index = (carving + interval)
       current_inner_index[i] = inner_index
-      current_interval[i] = params:get("offset") + ((collection_0[outer_index][inner_index] + 24) + ( 7 * params:get("transposition " ..i))) % 12
+      current_interval[i] = params:get("offset") + (params:get('key') + (collection_0[outer_index][inner_index] + 24) + ( 7 * params:get("transposition " ..i))) % 12
       current_octave[i] = (params:get("track octave " ..i) + params:get("octave " ..i .. " " .. params:get("current octave step " ..i))) * 12
       current_offset[i] = offset_list[params:get("offset mode")][params:get("offset " ..i)]
       current_note[i] = current_interval[i] + current_octave[i] + current_offset[i]
       current_channel[i] = params:get("midi channel " ..i)
             if  i == 1 then
         if
-        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], math.random(100, 127) - current_note[i], current_channel[i], 1) end
+        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], 127, current_channel[i], 1) end
       elseif i == 2 then
         if
-        params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], math.random(100) - current_note[i], current_channel[i], 2)end
+        params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], 127, current_channel[i], 2)end
       elseif i == 3 then
         if
-        params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], math.random(100, 127) - current_note[i], current_channel[i], 3) end
+        params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], 127, current_channel[i], 3) end
       elseif i == 4 then
         if
-        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], math.random(100, 127) - current_note[i], current_channel[i], 4) end
+        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], 127, current_channel[i], 4) end
       end
 
 end
@@ -252,14 +252,10 @@ function play(note, vel, channel, track)
   m:note_on(note, vel, channel)
   engine.mx_note_on(note,vel/127,40)
   end end
-  clock.run(
-    function()
-      clock.sleep(1/16)
+      clock.get_beats(1/16)
           m:note_off(note, vel, channel)
           engine.mx_note_off(note)
 
-end
-)
 end
 
 function m:all_off()
