@@ -11,12 +11,6 @@ end
 -- count how many in queue, create group of that size
 -- then actually add the parameters
 
-for i = 1,4,1 do
-
-params:add_option("voice " ..i, "voice " ..i, { "alto_sax_choir", "angelic_dobro", "asat_classic_clean", "bedroom_clarinet_short", "bedroom_clarinet_sustained", "box_violin", "cello", "cello_pad", "cow_pad", "dictaphone", "discord_choir", "doom_drone", "drums_violin", "dyn_evo_choir_fast", "epiano_dx7", "gentle_vibes", "india_ashberry_dry", "marimba_red", "marimba_white", "music_box", "phils_banjo", "raindrop_c40", "sweep_violins", "tatak_piano", "trembling_radiator", "trembling_radiator_ebow", "wind_chimes"}, 24)
-
-end
-
 function dequeue_param_group(group_name)
   print("creating group "..group_name.." with "..#param_queue.." params")
   params:add_group(group_name, #param_queue)
@@ -75,7 +69,9 @@ for i = 1,4,1 do
       queue_add_param{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 0 }
       queue_add_param{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 5, default = 1 }
       queue_add_param{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
-
+      queue_add_param{ type = "number", id = "gate probability " ..i .." "..j, name = "gate probability " ..i .." "..j, min = 0, max = 100, default = 100 }
+      queue_add_param{ type = "number", id = "interval probability " ..i .." "..j, name = "interval probability " ..i .." "..j, min = 0, max = 100, default = 100 }
+      queue_add_param{ type = "number", id = "octave probability " ..i .." "..j, name = "octave probability " ..i .." "..j, min = 0, max = 100, default = 100 }
     end
 
 end
@@ -245,28 +241,23 @@ end
         params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], math.random(100, 127) - current_note[i], current_channel[i], 3) end
       elseif i == 4 then
         if
-        params:get("gate 3 " ..params:get("current gate step 4")) == 1 then play(current_note[i], math.random(100, 127) - current_note[i], current_channel[i], 4) end
+        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], math.random(100, 127) - current_note[i], current_channel[i], 4) end
       end
 
 end
 
 function play(note, vel, channel, track)
-  if math.random(0, 100) < params:get('probability ' ..track) then
+  if math.random(0, 100) <= params:get('probability ' ..track) then
+  if math.random(0,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
   m:note_on(note, vel, channel)
-  end
+  engine.mx_note_on(note,vel/127,40)
+  end end
   clock.run(
     function()
-      clock.sleep(1)
+      clock.sleep(1/16)
           m:note_off(note, vel, channel)
-          if track == 1 then
-          skeys:off({name="voice 1",midi=note})
-          elseif track == 2 then
-          skeys:off({name="voice 2", midi=note})
-          elseif track == 3 then
-          skeys:off({name="voice 3", midi=note})
-          elseif track == 4 then
-          skeys: off({name="voice 4", midi=note})
-          end
+          engine.mx_note_off(note)
+
 end
 )
 end

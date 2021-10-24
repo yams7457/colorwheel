@@ -2,8 +2,10 @@ include 'lib/core'
 include 'lib/norns'
 include 'lib/grid'
 include 'lib/algebra'
-include 'lib/resonate-r'
 lattice = require("lib/lattice")
+local mxsynths_=include("mx.synths/lib/mx.synths")
+mxsynths=mxsynths_:new()
+engine.name="MxSynths"
 
 g = grid.connect()
 
@@ -16,6 +18,22 @@ function key(n,z)
     randomize()
   end
   end
+end
+
+function down_a_fifth()
+   params:set('transpose', (params:get('transpose') + 5) % 12)
+end
+          
+function up_a_fifth()
+    params:set('transpose', (params:get('transpose') + 7) % 12)
+end
+
+function return_to_root()
+    params:set('transpose', 0)
+end
+
+function return_to_c()
+    params:set('key', 0)
 end
 
 function randomize()
@@ -41,17 +59,24 @@ end
 end
 end
 
+function clock_sync()
+  for i = 1,4,1
+  do params:set("gate div " ..i, 1)
+     params:set("interval div " ..i, 1)
+     params:set("octave div " ..i, 1)
+  end
+  end
 
 seqorlive = nest_ {
-    meta = _grid.number {
-      x = {15, 16},
+    meta = _grid.toggle {
+      x = 16,
       y = 8,
       level = {4, 15}
 },
 
 seq = nest_ {
     enabled = function(self)
-        return (seqorlive.meta.value == 1)
+        return (seqorlive.meta.value == 0)
     end,
 
     loop_mod = _grid.momentary {
@@ -215,42 +240,6 @@ seq = nest_ {
                             seqorlive.seq.prob_mod.value == 0)
                 end},
 
-            metarange = _grid.range {
-                x = {1, 16},
-                y = 7,
-                level = 4,
-
-                controlspec = params:lookup_param('meta loop start').controlspec,
-
-                value = function()
-                  return {params:get('meta loop start'), params:get('meta loop end')}
-                end,
-
-                action = function(s, v)
-                  params:set('meta loop start', v[1])
-                  params:set('meta loop end', v[2])
-                  meta_counter = meta_counter + 1
-                  if meta_counter % 2 == 1 then
-                  meta_start_1 = v[1]
-                  meta_end_1 = v[2]
-
-                  else
-                  meta_start_2 = v[1]
-                  meta_end_2 = v[2]
-                  end
-                  if meta_start_1 ~= meta_start_2 or meta_end_1 ~= meta_end_2 then
-                  for i = 1,4,1 do
-                  params:set('gate sequence start ' ..i, params:get('meta loop start'))
-
-                  params:set('interval sequence start ' ..i, params:get('meta loop start'))
-
-                  params:set('octave sequence start ' ..i, params:get('meta loop start'))
-                  end
-
-                  end
-                end,
-            },
-
 gatefield_5 = nest_(16):each(function(i,v)
 
     return _grid.toggle {
@@ -263,10 +252,17 @@ gatefield_5 = nest_(16):each(function(i,v)
               if i >= params:get('gate sequence start 1') then
                 if i <= params:get('gate sequence end 1') then
                 return 10
+                end
                 else return 2
-                   end end
+                   end
 
             else return 0 end
+            
+            if params:get('gate 1 ' ..i) == 1 then
+              if i > params:get('gate sequence end 1') then
+                return 2
+                end
+            end
         end,
       controlspec = params:lookup_param('gate 1 ' ..i).controlspec,
       value = function() return params:get('gate 1 ' ..i) end,
@@ -311,10 +307,17 @@ gatefield_6 = nest_(16):each(function(i,v)
               if i >= params:get('gate sequence start 2') then
                 if i <= params:get('gate sequence end 2') then
                 return 10
+                end
                 else return 2
-                   end end
+                   end
 
             else return 0 end
+            
+            if params:get('gate 2 ' ..i) == 1 then
+              if i > params:get('gate sequence end 2') then
+                return 2
+                end
+            end
         end,
       controlspec = params:lookup_param('gate 2 ' ..i).controlspec,
       value = function() return params:get('gate 2 ' ..i) end,
@@ -359,10 +362,17 @@ gatefield_7 = nest_(16):each(function(i,v)
               if i >= params:get('gate sequence start 3') then
                 if i <= params:get('gate sequence end 3') then
                 return 10
+                end
                 else return 2
-                   end end
+                   end
 
             else return 0 end
+            
+            if params:get('gate 3 ' ..i) == 1 then
+              if i > params:get('gate sequence end 3') then
+                return 2
+                end
+            end
         end,
       controlspec = params:lookup_param('gate 3 ' ..i).controlspec,
       value = function() return params:get('gate 3 ' ..i) end,
@@ -400,18 +410,25 @@ range_display_7 = nest_(16):each(function(i,v)
                 return _grid.toggle {
                   x = i,
                   y = 4,
-                  level = function(self)
-                        if i == params:get('current gate step 4') then return 15
+      level = function(self)
+            if i == params:get('current gate step 4') then return 15
 
-                        elseif params:get('gate 4 ' ..i) == 1 then
-                          if i >= params:get('gate sequence start 4') then
-                            if i <= params:get('gate sequence end 4') then
-                            return 10
-                            else return 2
-                               end end
+            elseif params:get('gate 4 ' ..i) == 1 then
+              if i >= params:get('gate sequence start 4') then
+                if i <= params:get('gate sequence end 4') then
+                return 10
+                end
+                else return 2
+                   end
 
-                        else return 0 end
-                    end,
+            else return 0 end
+            
+            if params:get('gate 4 ' ..i) == 1 then
+              if i > params:get('gate sequence end 4') then
+                return 2
+                end
+            end
+        end,
                   controlspec = params:lookup_param('gate 4 ' ..i).controlspec,
                   value = function() return params:get('gate 4 ' ..i) end,
                   action = function(s,v) params:set('gate 4 ' ..i, v) end,
@@ -453,7 +470,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
-
+                    controlspec = params:lookup_param('gate probability 1 ' ..i).controlspec,
+                    value = function() return params:get('gate probability 1 ' ..i) / 25 end,
+                    action = function(s, v) params:set('gate probability 1 ' ..i, v * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and
                             seqorlive.seq.time_mod.value == 0 and
@@ -533,7 +552,7 @@ range_display_7 = nest_(16):each(function(i,v)
     interval_tab_1 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 2 and
                     seqorlive.seq.track.value == 1)
             end,
@@ -599,7 +618,7 @@ range_display_7 = nest_(16):each(function(i,v)
     interval_tab_2 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 2 and
                     seqorlive.seq.track.value == 2)
             end,
@@ -662,7 +681,7 @@ range_display_7 = nest_(16):each(function(i,v)
     interval_tab_3 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 2 and
                     seqorlive.seq.track.value == 3)
             end,
@@ -724,7 +743,7 @@ range_display_7 = nest_(16):each(function(i,v)
       interval_tab_4 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 2 and
                     seqorlive.seq.track.value == 4)
             end,
@@ -787,7 +806,7 @@ range_display_7 = nest_(16):each(function(i,v)
     octave_tab_1 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 3 and
                     seqorlive.seq.track.value == 1)
             end,
@@ -866,7 +885,7 @@ range_display_7 = nest_(16):each(function(i,v)
     octave_tab_2 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 3 and
                     seqorlive.seq.track.value == 2)
             end,
@@ -944,7 +963,7 @@ range_display_7 = nest_(16):each(function(i,v)
     octave_tab_3 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 3 and
                     seqorlive.seq.track.value == 3)
             end,
@@ -1018,7 +1037,7 @@ range_display_7 = nest_(16):each(function(i,v)
       octave_tab_4 = nest_ {
 
         enabled = function(self)
-            return (seqorlive.meta.value == 1 and
+            return (seqorlive.meta.value == 0 and
                     seqorlive.seq.tab.value == 3 and
                     seqorlive.seq.track.value == 4)
             end,
@@ -1088,19 +1107,116 @@ range_display_7 = nest_(16):each(function(i,v)
                     end
             }
     },
-
+    
+    live_down = _grid.momentary{
+      x = 10,
+      y = 6,
+      level = {5, 15},
+      value = 0,
+      action = function () if seqorlive.live_down.value == 1 then down_a_fifth() end end,
+      enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+      
+    },
+  
+    live_double_down = _grid.momentary{
+      x = 9,
+      y = 6,
+      level = {10, 15},
+      value = 0,
+      action = function () if seqorlive.live_double_down.value == 1 then down_a_fifth() down_a_fifth() end end,
+      enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+      
+    },
+  
+    --return_to_root = _grid.momentary{
+      --x = 3,
+--      y = 8,
+--      level = 15,
+--      value = 0,
+--      action = function () if seqorlive.return_to_root.value == 1 then return_to_root() end end,
+--      enabled = function(self)
+--              return (seqorlive.meta.value == 2)
+--              end
+--    },
+    
+    clock_sync = _grid.momentary{
+      x = 3,
+      y = 7,
+      level = {5, 15},
+      value = 0,
+      action = function () if seqorlive.clock_sync.value == 1 then clock_sync() end end,
+      enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+      
+    },
+    
+    live_up = _grid.momentary{
+      x = 11,
+      y = 6,
+      level = {5, 15},
+      value = 0,
+      action = function () if seqorlive.live_up.value == 1 then up_a_fifth() end end,
+      enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+      
+    },
+  
+    live_double_up = _grid.momentary{
+      x = 12,
+      y = 6,
+      level = {10, 15},
+      value = 0,
+      action = function () if seqorlive.live_double_up.value == 1 then up_a_fifth() up_a_fifth() end end,
+      enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+      
+    },
+    
+    live_key_1 = _grid.number {
+          x = {9, 14},
+          y = 7,
+          level = {3, 15},
+          controlspec = params:lookup_param('key').controlspec,
+          action = function(s,v) 
+            params:set('key', ((v - 1) * 7 % 12))
+            seqorlive.live_key_2.value = 0 end,
+          enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+    },
+    live_key_2 = _grid.number {
+          x = {9, 14},
+          y = 8,
+          level = {3, 15},
+          value = 0,
+          controlspec = params:lookup_param('key').controlspec,
+          action = function(s,v) 
+            params:set('key', (v * 5 % 12))
+            seqorlive.live_key_1.value = 0 end,
+          enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+    },
+    
     live_offset = nest_(4):each(function(i,v)
 
 
         return _grid.number {
             x = i,
-            y = {1, 5},
-            level = 15,
+            y = {2, 6},
+            level = 5,
             controlspec = params:lookup_param('offset ' ..i).controlspec,
             value = function() return params:get('offset ' ..i) end,
             action = function(s, v) params:set('offset ' ..i, v) end,
             enabled = function(self)
-                return (seqorlive.meta.value == 2)
+                return (seqorlive.meta.value == 1)
                 end
         }end),
       
@@ -1109,13 +1225,13 @@ range_display_7 = nest_(16):each(function(i,v)
 
         return _grid.number {
             x = i + 4,
-            y = {1, 5},
-            level = 5,
+            y = {2, 6},
+            level = 15,
             controlspec = params:lookup_param('transposition ' ..i).controlspec,
             value = function() return params:get('transposition ' ..i) + 3 end,
             action = function(s, v) params:set('transposition ' ..i, v - 3) end,
             enabled = function(self)
-                return (seqorlive.meta.value == 2)
+                return (seqorlive.meta.value == 1)
                 end
         }end),
       
@@ -1124,13 +1240,13 @@ range_display_7 = nest_(16):each(function(i,v)
 
         return _grid.number {
             x = i + 8,
-            y = {1, 4},
-            level = 15,
+            y = {2, 5},
+            level = 5,
             controlspec = params:lookup_param('carving ' ..i).controlspec,
             value = function() return params:get('carving ' ..i) + 1 end,
             action = function(s, v) params:set('carving ' ..i, v - 1) end,
             enabled = function(self)
-                return (seqorlive.meta.value == 2)
+                return (seqorlive.meta.value == 1)
                 end
         }end),    
     
@@ -1139,19 +1255,60 @@ range_display_7 = nest_(16):each(function(i,v)
 
         return _grid.number {
             x = i + 12,
-            y = {1, 5},
-            level = 5,
+            y = {2, 6},
+            level = 15,
             controlspec = params:lookup_param('probability ' ..i).controlspec,
             value = function() return math.floor(params:get('probability ' ..i) / 25 + 1)  end,
             action = function(s, v) params:set('probability ' ..i, (v - 1) * 25) end,
             enabled = function(self)
-                return (seqorlive.meta.value == 2)
+                return (seqorlive.meta.value == 1)
                 end
         }end), 
-      
-      live_metarange = _grid.range {
+        
+        metarange = _grid.range {
                 x = {1, 16},
                 y = 7,
+                level = 4,
+
+                controlspec = params:lookup_param('meta loop start').controlspec,
+
+                value = function()
+                  return {params:get('meta loop start'), params:get('meta loop end')}
+                end,
+                enabled = function(self)
+                  return (seqorlive.seq.tab.value == 1 and
+                          seqorlive.meta.value == 0)
+                  end,
+                action = function(s, v)
+                  params:set('meta loop start', v[1])
+                  params:set('meta loop end', v[2])
+                  meta_counter = meta_counter + 1
+                  if meta_counter % 2 == 1 then
+                  meta_start_1 = v[1]
+                  meta_end_1 = v[2]
+
+                  else
+                  meta_start_2 = v[1]
+                  meta_end_2 = v[2]
+                  end
+                  for i = 1,4,1 do
+                  params:set('gate sequence start ' ..i, params:get('meta loop start'))
+
+                  params:set('interval sequence start ' ..i, params:get('meta loop start'))
+
+                  params:set('octave sequence start ' ..i, params:get('meta loop start'))
+                  
+                  params:set('gate sequence end ' ..i, params:get('meta loop end'))
+                  
+                  params:set('interval sequence end ' ..i, params:get('meta loop end'))
+
+                  params:set('octave sequence end ' ..i, params:get('meta loop end'))
+                  end
+                end,
+            },
+      live_metarange = _grid.range {
+                x = {1, 16},
+                y = 1,
                 level = 4,
 
                 controlspec = params:lookup_param('meta loop start').controlspec,
@@ -1179,12 +1336,18 @@ range_display_7 = nest_(16):each(function(i,v)
                   params:set('interval sequence start ' ..i, params:get('meta loop start'))
 
                   params:set('octave sequence start ' ..i, params:get('meta loop start'))
+                  
+                  params:set('gate sequence end ' ..i, params:get('meta loop end'))
+                  
+                  params:set('interval sequence end ' ..i, params:get('meta loop end'))
+
+                  params:set('octave sequence end ' ..i, params:get('meta loop end'))
                   end
                   end
               
                 end,
                 enabled = function(self)
-                return (seqorlive.meta.value == 2)
+                return (seqorlive.meta.value == 1)
                 end
 
     
@@ -1192,93 +1355,95 @@ range_display_7 = nest_(16):each(function(i,v)
 
 seqorlive:connect { g = grid.connect() }
 function init()
+  
     algebra.init()
     my_lattice = lattice:new()
+    ppqn = 16
   gate_transport_1 = my_lattice:new_pattern{
       action = function(t) tick(1)
-      gate_transport_1.division = params:get('gate div 1') / 32
+      gate_transport_1.division = params:get('gate div 1') / 16
       end,
-      division = params:get('gate div 1') / 32
+      division = params:get('gate div 1') / 16
   }
 
   gate_transport_2 = my_lattice:new_pattern{
       action = function(t) tick(2)
-        gate_transport_2.division = params:get('gate div 2') / 32
+        gate_transport_2.division = params:get('gate div 2') / 16
         end,
-      division = params:get('gate div 2') / 32
+      division = params:get('gate div 2') / 16
   }
 
     gate_transport_3 = my_lattice:new_pattern{
       action = function(t) tick(3)
-        gate_transport_3.division = params:get('gate div 3') / 32
+        gate_transport_3.division = params:get('gate div 3') / 16
         end,
-      division = params:get('gate div 3') / 32
+      division = params:get('gate div 3') / 16
   }
 
     gate_transport_4 = my_lattice:new_pattern{
       action = function(t) tick (4)
-        gate_transport_4.division = params:get('gate div 4') / 32
+        gate_transport_4.division = params:get('gate div 4') / 16
         end,
-      division = params:get('gate div 4') / 32
+      division = params:get('gate div 4') / 16
   }
 
 interval_transport_1 = my_lattice:new_pattern{
     action = function(t) interval_tick(1)
-      interval_transport_1.division = params:get('interval div 1') / 32
+      interval_transport_1.division = params:get('interval div 1') / 16
       end,
-    division = params:get('interval div 1') / 32
+    division = params:get('interval div 1') / 16
 }
 
 interval_transport_2 = my_lattice:new_pattern{
     action = function(t) interval_tick(2)
-    interval_transport_2.division = params:get('interval div 2') / 32
+    interval_transport_2.division = params:get('interval div 2') / 16
       end,
-    division = params:get('interval div 2') / 32
+    division = params:get('interval div 2') / 16
 }
 
   interval_transport_3 = my_lattice:new_pattern{
     action = function(t) interval_tick(3)
-      interval_transport_3.division = params:get('interval div 3') / 32
+      interval_transport_3.division = params:get('interval div 3') / 16
       end,
-    division = params:get('interval div 3') / 32
+    division = params:get('interval div 3') / 16
 }
 
   interval_transport_4 = my_lattice:new_pattern{
     action = function(t) interval_tick(4)
-      interval_transport_4.division = params:get('interval div 4') / 32
+      interval_transport_4.division = params:get('interval div 4') / 16
       end,
-    division = params:get('interval div 4') / 32
+    division = params:get('interval div 4') / 16
 }
 
 octave_transport_1 = my_lattice:new_pattern{
     action = function(t) octave_tick(1)
-      octave_transport_1.division = params:get('octave div 1') / 32
+      octave_transport_1.division = params:get('octave div 1') / 16
       end,
-    division = params:get('octave div 1') / 32
+    division = params:get('octave div 1') / 16
 }
 
 octave_transport_2 = my_lattice:new_pattern{
     action = function(t) octave_tick(2)
-      octave_transport_2.division = params:get('octave div 2') / 32
+      octave_transport_2.division = params:get('octave div 2') / 16
       end,
-    division = params:get('octave div 2') / 32
+    division = params:get('octave div 2') / 16
 }
 
   octave_transport_3 = my_lattice:new_pattern{
     action = function(t) octave_tick(3)
-      octave_transport_3.division = params:get('octave div 3') / 32
+      octave_transport_3.division = params:get('octave div 3') / 16
       end,
-    division = params:get('octave div 3') / 32
+    division = params:get('octave div 3') / 16
 }
 
   octave_transport_4 = my_lattice:new_pattern{
     action = function(t) octave_tick (4)
-      octave_transport_4.division = params:get('octave div 4') / 32
+      octave_transport_4.division = params:get('octave div 4') / 16
       end,
-    division = params:get('octave div 4') / 32
+    division = params:get('octave div 4') / 16
 }
     refresh = my_lattice:new_pattern{
-      action = function(t) seqorlive:update()
+      action = function(t) seqorlive.seq:update()
         if params:get("track active 1") == 1 then
           gate_transport_1:start()
           interval_transport_1:start()
@@ -1321,6 +1486,5 @@ octave_transport_2 = my_lattice:new_pattern{
     }
 
   meta_counter = 0
-
   my_lattice:start()
   seqorlive:init() end
