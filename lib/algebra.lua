@@ -16,10 +16,16 @@ function dequeue_param_group(group_name)
   params:add_group(group_name, #param_queue)
   print("adding "..#param_queue.." params")
   for queue_index=1, #param_queue do
-    params:add(param_queue[queue_index])
+    item = param_queue[queue_index]
+    if item.type == "option" then
+      params:add_option(item.id, item.name, item.options, item.default)
+    else
+      params:add(item)
+    end
   end
   param_queue = {}
 end
+
 queue_add_param{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
 queue_add_param{ type = "number", id = "meta loop start", name = "meta loop start", min = 1, max = 16, default = 1 }
 queue_add_param{ type = "number", id = "meta loop end", name = "meta loop end", min = 1, max = 16, default = 6 }
