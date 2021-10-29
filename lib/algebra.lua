@@ -40,27 +40,34 @@ for i = 1,4,1
 queue_add_param{ type = "number", id = "gate div " ..i, name = "gate div " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "interval div " ..i, name = "interval div " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "octave div " ..i, name = "gate div " ..i, min = 1, max = 16, default = 1}
-queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
+queue_add_param{ type = "number", id = "velocity div " ..i, name = "velocity div " ..i, min = 1, max = 16, default = 1}
+queue_add_param{ type = "number", id = "length div " ..i, name = "length div " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "track active " ..i, name = "track active " ..i, min = 0, max = 1, default = 1 }
 queue_add_param{ type = "number", id = "track octave " ..i, name = "track octave " ..i, min = 1, max = 6, default = i }
 queue_add_param{ type = "number", id = "offset " ..i, name = "offset " ..i, min = 1, max = 5, default = 3}
 queue_add_param{ type = "number", id = "transposition " ..i, name = "transposition " ..i, min = -2, max = 2, default = 0}
 queue_add_param{ type = "number", id = "carving " ..i, name = "carving " ..i, min = 0, max = 3, default = 3}
-queue_add_param{ type = "number", id = "probability " ..i, name = "probability " ..i, min = 0, max = 100, default = 75 }
+queue_add_param{ type = "number", id = "probability " ..i, name = "probability " ..i, min = 0, max = 100, default = 100 }
 queue_add_param{ type = "number", id = "clock channel " ..i, name = "clock channel " ..i, min = 1, max = 4, default = 1 }
 queue_add_param{ type = "number", id = "gate sequence start " ..i, name = "gate sequence start " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "interval sequence start " ..i, name = "interval sequence start " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "octave sequence start " ..i, name = "octave sequence start " ..i, min = 1, max = 16, default = 1}
+queue_add_param{ type = "number", id = "velocity sequence start " ..i, name = "velocity sequence start " ..i, min = 1, max = 16, default = 1}
+queue_add_param{ type = "number", id = "length sequence start " ..i, name = "length sequence start " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "gate sequence end " ..i, name = "gate sequence end " ..i, min = 1, max = 16, default = 6}
 queue_add_param{ type = "number", id = "interval sequence end " ..i, name = "interval sequence end " ..i, min = 1, max = 16, default = 6}
 queue_add_param{ type = "number", id = "octave sequence end " ..i, name = "octave sequence end " ..i, min = 1, max = 16, default = 6}
+queue_add_param{ type = "number", id = "velocity sequence end " ..i, name = "velocity sequence end " ..i, min = 1, max = 16, default = 6}
+queue_add_param{ type = "number", id = "length sequence end " ..i, name = "length sequence end " ..i, min = 1, max = 16, default = 6}
 queue_add_param{ type = "number", id = "current gate step " ..i, name = "current gate step " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "current interval step " ..i, name = "current interval step " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "current octave step " ..i, name = "current octave step " ..i, min = 1, max = 16, default = 1}
+queue_add_param{ type = "number", id = "current velocity step " ..i, name = "current velocity step " ..i, min = 1, max = 16, default = 1}
+queue_add_param{ type = "number", id = "current length step " ..i, name = "current length step " ..i, min = 1, max = 16, default = 1}
+
+  dequeue_param_group("track " ..i)
 
 end
-
-  dequeue_param_group("tracks")
 
 for i = 1,4,1 do
 
@@ -68,15 +75,17 @@ for i = 1,4,1 do
 
       queue_add_param{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 0 }
       queue_add_param{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 5, default = 1 }
+      queue_add_param{ type = "number", id = "velocity " ..i .." "..j, name = "velocity " ..i .." "..j, min = 0, max = 127, default = 127 }
+      queue_add_param{ type = "option", id = "length " ..i .." "..j, name = "length " ..i .." "..j, {"1/4", "1/2", "1", "2", "4"}, default = 1 }
       queue_add_param{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
       queue_add_param{ type = "number", id = "gate probability " ..i .." "..j, name = "gate probability " ..i .." "..j, min = 0, max = 100, default = 100 }
       queue_add_param{ type = "number", id = "interval probability " ..i .." "..j, name = "interval probability " ..i .." "..j, min = 0, max = 100, default = 100 }
       queue_add_param{ type = "number", id = "octave probability " ..i .." "..j, name = "octave probability " ..i .." "..j, min = 0, max = 100, default = 100 }
     end
 
-end
+dequeue_param_group("steps " ..i)
 
-dequeue_param_group("steps")
+end
 
 step = 0
 
@@ -101,6 +110,8 @@ current_octave_step = {}
 current_gate = {}
 current_interval = {}
 current_octave = {}
+current_velocity = {}
+current_length = {}
 current_note = {}
 current_channel = {}
 
@@ -186,6 +197,74 @@ params:get("octave sequence end " ..i)
 end
 end
 
+function velocity_tick(i)
+if (params:get("velocity sequence start " ..i) < params:get("current velocity step " ..i)) and (params:get("current velocity step " ..i) < params:get("velocity sequence end " ..i))
+
+  then
+
+  params:set(("current velocity step " ..i), params:get("current velocity step " ..i) + 1)
+
+elseif params:get("current velocity step " ..i) >= params:get("velocity sequence end " ..i)
+
+  then
+
+  params:set(("current velocity step " ..i), params:get("velocity sequence start " ..i))
+
+elseif params:get("current velocity step " ..i) < params:get("velocity sequence start " ..i)
+
+  then
+
+  params:set(("current velocity step " ..i), params:get("velocity sequence start " ..i))
+
+elseif params:get("current velocity step " ..i) == params:get("velocity sequence start " ..i)
+
+  then
+
+  params:set(("current velocity step " ..i), params:get("current velocity step " ..i) + 1)
+
+elseif params:get("current velocity step " ..i) > params:get("velocity sequence end " ..i)
+
+  then
+
+  params:set(("current velocity step " ..i), params:get("velocity sequence start " ..i))
+
+end
+end
+
+function length_tick(i)
+if (params:get("length sequence start " ..i) < params:get("current length step " ..i)) and (params:get("current length step " ..i) < params:get("length sequence end " ..i))
+
+  then
+
+  params:set(("current length step " ..i), params:get("current length step " ..i) + 1)
+
+elseif params:get("current length step " ..i) >= params:get("length sequence end " ..i)
+
+  then
+
+  params:set(("current length step " ..i), params:get("length sequence start " ..i))
+
+elseif params:get("current length step " ..i) < params:get("length sequence start " ..i)
+
+  then
+
+  params:set(("current length step " ..i), params:get("length sequence start " ..i))
+
+elseif params:get("current length step " ..i) == params:get("length sequence start " ..i)
+
+  then
+
+  params:set(("current length step " ..i), params:get("current length step " ..i) + 1)
+
+elseif params:get("current length step " ..i) > params:get("length sequence end " ..i)
+
+  then
+
+  params:set(("current length step " ..i), params:get("length sequence start " ..i))
+
+end
+end
+
 
 function tick(i)
     step = step + 1
@@ -232,7 +311,7 @@ end
       current_channel[i] = params:get("midi channel " ..i)
             if  i == 1 then
         if
-        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], 127, current_channel[i], 1) end
+        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], params:get("velocity 1 " ..params:get("current velocity step 1")), current_channel[i], 1) end
       elseif i == 2 then
         if
         params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], 127, current_channel[i], 2)end
@@ -250,12 +329,14 @@ function play(note, vel, channel, track)
   if math.random(0, 100) <= params:get('probability ' ..track) then
   if math.random(0,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
   m:note_on(note, vel, channel)
-  engine.mx_note_on(note,vel/127,40)
+    print(vel)
   end end
-      clock.get_beats(1/16)
-          m:note_off(note, vel, channel)
-          engine.mx_note_off(note)
+  note_off(note, vel, channel)
+end
 
+function note_off(note, vel, channel)
+      clock.sync(1/4)
+       m:note_off(note, vel, channel)
 end
 
 function m:all_off()

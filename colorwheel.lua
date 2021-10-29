@@ -3,13 +3,15 @@ include 'lib/norns'
 include 'lib/grid'
 include 'lib/algebra'
 lattice = require("lib/lattice")
-local mxsynths_=include("mx.synths/lib/mx.synths")
-mxsynths=mxsynths_:new()
-engine.name="MxSynths"
 
 g = grid.connect()
 
 --gridwork
+
+velocity_values = { 0, 32, 64, 96, 127 }
+length_values = {1/4, 1/2, 1, 2, 4}
+
+
 
 function key(n,z)
   if n == 3 and z == 1 then
@@ -45,9 +47,11 @@ params:set("octave div " ..i, math.random (1, 6))
 params:set("gate sequence start " ..i, math.random(1, 8))
 params:set("interval sequence start " ..i, math.random(1, 8))
 params:set("octave sequence start " ..i, math.random (1, 8))
+params:set("velocity sequence start " ..i, math.random(1,8))
 params:set("gate sequence end " ..i, math.random(params:get("gate sequence start " ..i) + 3, 16))
 params:set("interval sequence end " ..i, math.random(params:get("interval sequence start " ..i) + 3, 16))
 params:set("octave sequence end " ..i, math.random (params:get("octave sequence start " ..i) + 3, 16))
+params:set("velocity sequence end " ..i, math.random (params:get("octave sequence end " ..i) + 3, 16))
 params:set("offset " ..i, (params:get("offset " ..i) + math.random(-1,1) - 1) % 5 + 1)
 params:set("transposition " ..i, ((params:get("transposition " ..i) + (math.random(-1, 1)) + 2) % 5 - 2))
 
@@ -55,6 +59,7 @@ for j = 1,16,1 do
 
 params:set("gate " ..i .." "..j, math.random(0, 1))
 params:set("interval " ..i .." "..j, math.random (1, 5))
+params:set("velocity " ..i .." "..j, velocity_values[math.random (2, 5)])
 end
 end
 end
@@ -80,22 +85,22 @@ seq = nest_ {
     end,
 
     loop_mod = _grid.momentary {
-        x = 11,
+        x = 12,
         y = 8,
         level = {4, 15 } },
 
     time_mod = _grid.momentary {
-        x = 12,
-        y = 8,
-        level = {4, 15} },
-
-    prob_mod = _grid.momentary {
         x = 13,
         y = 8,
         level = {4, 15} },
 
+    prob_mod = _grid.momentary {
+        x = 14,
+        y = 8,
+        level = {4, 15} },
+
     tab = _grid.number {
-        x = {6, 9},
+        x = {6, 10},
         y = 8,
         level = {4, 15} },
 
@@ -1107,6 +1112,519 @@ range_display_7 = nest_(16):each(function(i,v)
                     end
             }
     },
+  
+  
+  velocity_tab_1 = nest_ {
+
+    enabled = function(self)
+        return (seqorlive.meta.value == 0 and
+                seqorlive.seq.tab.value == 4 and
+                seqorlive.seq.track.value == 1)
+        end,
+
+        velocity_dots_1 = nest_(16):each(function(i,v)
+
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = function(self)
+                    if i == params:get('current velocity step 1') then return 15
+                    else return 4 end
+                end,
+                controlspec = params:lookup_param('velocity 1 ' ..i).controlspec,
+                value = function() return math.floor( params:get('velocity 1 ' ..i) / 32 + 1.5) end,
+                action = function(s, v) params:set('velocity 1 ' ..i, velocity_values[v]) print(params:get('velocity 1 ' ..i)) end,
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 0)
+                    end
+            }end),
+
+        velocity_prob_1 = nest_(16):each(function(i,v)
+
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = {0, 6},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 1)
+                    end
+            }end),
+
+        velocity_clock_1 = _grid.number {
+            x = {1, 16},
+            y = 7,
+            level = {0, 4},
+            controlspec = params:lookup_param('velocity div 1').controlspec,
+            value = function() return params:get('velocity div 1') end,
+            action = function(s, v) params:set('velocity div 1', v) end
+        },
+
+        velocity_loop_1 = _grid.range {
+            x = {1, 16},
+            y = 6,
+            level = {0, 4},
+
+            value = function()
+                return { params:get('velocity sequence start 1'), params:get('velocity sequence end 1') }
+                end,
+
+            action = function(s, v)
+                params:set('velocity sequence start 1', v[1])
+                params:set('velocity sequence end 1', v[2])
+                end,
+        }
+
+
+
+    },
+
+velocity_tab_2 = nest_ {
+
+    enabled = function(self)
+        return (seqorlive.meta.value == 0 and
+                seqorlive.seq.tab.value == 4 and
+                seqorlive.seq.track.value == 2)
+        end,
+
+        velocity_dots_2 = nest_(16):each(function(i,v)
+
+             return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = function(self)
+                    if i == params:get('current velocity step 2') then return 15
+                    else return 4 end
+                end,
+controlspec = params:lookup_param('velocity 2 ' ..i).controlspec,
+value = function() return math.floor( params:get('velocity 2 ' ..i) / 32 + 1.5) end,
+action = function(s, v) params:set('velocity 2 ' ..i, velocity_values[v]) print(params:get('velocity 2 ' ..i)) end,
+enabled = function(self)
+    return (seqorlive.seq.prob_mod.value == 0)
+    end
+}end),
+
+        velocity_prob_2 = nest_(16):each(function(i,v)
+
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = {0, 6},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 1)
+                    end
+            }end),
+
+        velocity_clock_2 = _grid.number {
+            x = {1, 16},
+            y = 7,
+            level = {0, 4},
+            controlspec = params:lookup_param('velocity div 2').controlspec,
+            value = function() return params:get('velocity div 2') end,
+            action = function(s, v) params:set('velocity div 2', v) end
+        },
+
+        velocity_loop_2 = _grid.range {
+            x = {1, 16},
+            y = 6,
+            level = {0, 4},
+
+            value = function()
+                return { params:get('velocity sequence start 2'), params:get('velocity sequence end 2') }
+                end,
+
+            action = function(s, v)
+                params:set('velocity sequence start 2', v[1])
+                params:set('velocity sequence end 2', v[2])
+                end,
+        }},
+
+
+
+velocity_tab_3 = nest_ {
+
+    enabled = function(self)
+        return (seqorlive.meta.value == 0 and
+                seqorlive.seq.tab.value == 4 and
+                seqorlive.seq.track.value == 3)
+        end,
+
+        velocity_dots_3 = nest_(16):each(function(i,v)
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = function(self)
+                    if i == params:get('current velocity step 3') then return 15
+                    else return 4 end
+                end,
+controlspec = params:lookup_param('velocity 3 ' ..i).controlspec,
+value = function() return math.floor( params:get('velocity 3 ' ..i) / 32 + 1.5) end,
+action = function(s, v) params:set('velocity 3 ' ..i, velocity_values[v]) print(params:get('velocity 3 ' ..i)) end,
+enabled = function(self)
+    return (seqorlive.seq.prob_mod.value == 0)
+    end
+}end),
+
+        velocity_prob_3 = nest_(16):each(function(i,v)
+
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = {0, 6},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 1)
+                    end
+            }end),
+
+        velocity_clock_3 = _grid.number {
+            x = {1, 16},
+            y = 7,
+            level = {0, 4},
+            controlspec = params:lookup_param('velocity div 3').controlspec,
+            value = function() return params:get('velocity div 3') end,
+            action = function(s, v) params:set('velocity div 3', v) end
+        },
+
+        velocity_loop_3 = _grid.range {
+            x = {1, 16},
+            y = 6,
+            level = {0, 4},
+
+            value = function()
+                return { params:get('velocity sequence start 3'), params:get('velocity sequence end 3') }
+                end,
+
+            action = function(s, v)
+                params:set('velocity sequence start 3', v[1])
+                params:set('velocity sequence end 3', v[2])
+                end,
+        }
+},
+
+  velocity_tab_4 = nest_ {
+
+    enabled = function(self)
+        return (seqorlive.meta.value == 0 and
+                seqorlive.seq.tab.value == 4 and
+                seqorlive.seq.track.value == 4)
+        end,
+
+        velocity_dots_4 = nest_(16):each(function(i,v)
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = function(self)
+                    if i == params:get('current velocity step 1') then return 15
+                    else return 4 end
+                end,
+controlspec = params:lookup_param('velocity 4 ' ..i).controlspec,
+value = function() return math.floor( params:get('velocity 4 ' ..i) / 32 + 1.5) end,
+action = function(s, v) params:set('velocity 4 ' ..i, velocity_values[v]) print(params:get('velocity 4 ' ..i)) end,
+enabled = function(self)
+    return (seqorlive.seq.prob_mod.value == 0)
+    end
+}end),
+
+        velocity_prob_4 = nest_(16):each(function(i,v)
+
+
+            return _grid.number {
+                x = i,
+                y = {1, 5},
+                level = {0, 6},
+                enabled = function(self)
+                    return (seqorlive.seq.prob_mod.value == 1)
+                    end
+            }end),
+
+        velocity_clock_4 = _grid.number {
+            x = {1, 16},
+            y = 7,
+            level = {0, 4},
+            controlspec = params:lookup_param('velocity div 4').controlspec,
+            value = function() return params:get('velocity div 4') end,
+            action = function(s, v) params:set('velocity div 4', v) end
+        },
+
+        velocity_loop_4 = _grid.range {
+            x = {1, 16},
+            y = 6,
+            level = {0, 4},
+
+            value = function()
+                return { params:get('velocity sequence start 4'), params:get('velocity sequence end 4') }
+                end,
+
+            action = function(s, v)
+                params:set('velocity sequence start 4', v[1])
+                params:set('velocity sequence end 4', v[2])
+                end,
+        }
+},
+
+length_tab_1 = nest_ {
+
+  enabled = function(self)
+      return (seqorlive.meta.value == 0 and
+              seqorlive.seq.tab.value == 5 and
+              seqorlive.seq.track.value == 1)
+      end,
+
+      length_dots_1 = nest_(16):each(function(i,v)
+
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = function(self)
+                  if i == params:get('current length step 1') then return 15
+                  else return 4 end
+              end,
+              controlspec = params:lookup_param('length 1 ' ..i).controlspec,
+              value = function() return params:get('length 1 ' ..i)
+                end,
+              action = function(s, v) params:set('length 1 ' ..i, v) end,
+              enabled = function(self)
+                  return (seqorlive.seq.prob_mod.value == 0)
+                  end
+          }end),
+
+      length_prob_1 = nest_(16):each(function(i,v)
+
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = {0, 6},
+              enabled = function(self)
+                  return (seqorlive.seq.prob_mod.value == 1)
+                  end
+          }end),
+
+      length_clock_1 = _grid.number {
+          x = {1, 16},
+          y = 7,
+          level = {0, 4},
+          controlspec = params:lookup_param('length div 1').controlspec,
+          value = function() return params:get('length div 1') end,
+          action = function(s, v) params:set('length div 1', v) end
+      },
+
+      length_loop_1 = _grid.range {
+          x = {1, 16},
+          y = 6,
+          level = {0, 4},
+
+          value = function()
+              return { params:get('length sequence start 1'), params:get('length sequence end 1') }
+              end,
+
+          action = function(s, v)
+              params:set('length sequence start 1', v[1])
+              params:set('length sequence end 1', v[2])
+              end,
+      }
+
+
+
+  },
+
+length_tab_2 = nest_ {
+
+  enabled = function(self)
+      return (seqorlive.meta.value == 0 and
+              seqorlive.seq.tab.value == 5 and
+              seqorlive.seq.track.value == 2)
+      end,
+
+      length_dots_2 = nest_(16):each(function(i,v)
+
+           return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = function(self)
+                  if i == params:get('current length step 2') then return 15
+                  else return 4 end
+              end,
+controlspec = params:lookup_param('length 2 ' ..i).controlspec,
+              value = function() return params:get('length 2 ' ..i)
+                end,
+              action = function(s, v) params:set('length 2 ' ..i, v) end,
+enabled = function(self)
+  return (seqorlive.seq.prob_mod.value == 0)
+  end
+}end),
+
+      length_prob_2 = nest_(16):each(function(i,v)
+
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = {0, 6},
+              enabled = function(self)
+                  return (seqorlive.seq.prob_mod.value == 1)
+                  end
+          }end),
+
+      length_clock_2 = _grid.number {
+          x = {1, 16},
+          y = 7,
+          level = {0, 4},
+          controlspec = params:lookup_param('length div 2').controlspec,
+          value = function() return params:get('length div 2') end,
+          action = function(s, v) params:set('length div 2', v) end
+      },
+
+      length_loop_2 = _grid.range {
+          x = {1, 16},
+          y = 6,
+          level = {0, 4},
+
+          value = function()
+              return { params:get('length sequence start 2'), params:get('length sequence end 2') }
+              end,
+
+          action = function(s, v)
+              params:set('length sequence start 2', v[1])
+              params:set('length sequence end 2', v[2])
+              end,
+      }},
+
+
+
+length_tab_3 = nest_ {
+
+  enabled = function(self)
+      return (seqorlive.meta.value == 0 and
+              seqorlive.seq.tab.value == 5 and
+              seqorlive.seq.track.value == 3)
+      end,
+
+      length_dots_3 = nest_(16):each(function(i,v)
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = function(self)
+                  if i == params:get('current length step 3') then return 15
+                  else return 4 end
+              end,
+controlspec = params:lookup_param('length 3 ' ..i).controlspec,
+              value = function() return params:get('length 3 ' ..i)
+                end,
+              action = function(s, v) params:set('length 3 ' ..i, v) end,
+enabled = function(self)
+  return (seqorlive.seq.prob_mod.value == 0)
+  end
+}end),
+
+      length_prob_3 = nest_(16):each(function(i,v)
+
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = {0, 6},
+              enabled = function(self)
+                  return (seqorlive.seq.prob_mod.value == 1)
+                  end
+          }end),
+
+      length_clock_3 = _grid.number {
+          x = {1, 16},
+          y = 7,
+          level = {0, 4},
+          controlspec = params:lookup_param('length div 3').controlspec,
+          value = function() return params:get('length div 3') end,
+          action = function(s, v) params:set('length div 3', v) end
+      },
+
+      length_loop_3 = _grid.range {
+          x = {1, 16},
+          y = 6,
+          level = {0, 4},
+
+          value = function()
+              return { params:get('length sequence start 3'), params:get('length sequence end 3') }
+              end,
+
+          action = function(s, v)
+              params:set('length sequence start 3', v[1])
+              params:set('length sequence end 3', v[2])
+              end,
+      }
+},
+
+length_tab_4 = nest_ {
+
+  enabled = function(self)
+      return (seqorlive.meta.value == 0 and
+              seqorlive.seq.tab.value == 5 and
+              seqorlive.seq.track.value == 4)
+      end,
+
+      length_dots_4 = nest_(16):each(function(i,v)
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = function(self)
+                  if i == params:get('current length step 1') then return 15
+                  else return 4 end
+              end,
+controlspec = params:lookup_param('length 4 ' ..i).controlspec,
+              value = function() return params:get('length 4 ' ..i)
+                end,
+              action = function(s, v) params:set('length 4 ' ..i, v) end,
+enabled = function(self)
+  return (seqorlive.seq.prob_mod.value == 0)
+  end
+}end),
+
+      length_prob_4 = nest_(16):each(function(i,v)
+
+
+          return _grid.number {
+              x = i,
+              y = {1, 5},
+              level = {0, 6},
+              enabled = function(self)
+                  return (seqorlive.seq.prob_mod.value == 1)
+                  end
+          }end),
+
+      length_clock_4 = _grid.number {
+          x = {1, 16},
+          y = 7,
+          level = {0, 4},
+          controlspec = params:lookup_param('length div 4').controlspec,
+          value = function() return params:get('length div 4') end,
+          action = function(s, v) params:set('length div 4', v) end
+      },
+
+      length_loop_4 = _grid.range {
+          x = {1, 16},
+          y = 6,
+          level = {0, 4},
+
+          value = function()
+              return { params:get('length sequence start 4'), params:get('length sequence end 4') }
+              end,
+
+          action = function(s, v)
+              params:set('length sequence start 4', v[1])
+              params:set('length sequence end 4', v[2])
+              end,
+      }
+},
+  
+  
     
     live_down = _grid.momentary{
       x = 10,
@@ -1442,47 +1960,66 @@ octave_transport_2 = my_lattice:new_pattern{
       end,
     division = params:get('octave div 4') / 16
 }
+
+velocity_transport_1 = my_lattice:new_pattern{
+    action = function(t) velocity_tick(1)
+      velocity_transport_1.division = params:get('velocity div 1') / 16
+      end,
+    division = params:get('velocity div 1') / 16
+}
+
+velocity_transport_2 = my_lattice:new_pattern{
+    action = function(t) velocity_tick(2)
+      velocity_transport_2.division = params:get('velocity div 2') / 16
+      end,
+    division = params:get('velocity div 2') / 16
+}
+
+  velocity_transport_3 = my_lattice:new_pattern{
+    action = function(t) velocity_tick(3)
+      velocity_transport_3.division = params:get('velocity div 3') / 16
+      end,
+    division = params:get('velocity div 3') / 16
+}
+
+  velocity_transport_4 = my_lattice:new_pattern{
+    action = function(t) velocity_tick (4)
+      velocity_transport_4.division = params:get('velocity div 4') / 16
+      end,
+    division = params:get('velocity div 4') / 16
+}
+
+length_transport_1 = my_lattice:new_pattern{
+    action = function(t) length_tick(1)
+      length_transport_1.division = params:get('length div 1') / 16
+      end,
+    division = params:get('length div 1') / 16
+}
+
+length_transport_2 = my_lattice:new_pattern{
+    action = function(t) length_tick(2)
+      length_transport_2.division = params:get('length div 2') / 16
+      end,
+    division = params:get('length div 2') / 16
+}
+
+length_transport_3 = my_lattice:new_pattern{
+    action = function(t) length_tick(3)
+      length_transport_3.division = params:get('length div 3') / 16
+      end,
+    division = params:get('length div 3') / 16
+}
+
+  length_transport_4 = my_lattice:new_pattern{
+    action = function(t) length_tick (4)
+      length_transport_4.division = params:get('length div 4') / 16
+      end,
+    division = params:get('length div 4') / 16
+}
     refresh = my_lattice:new_pattern{
       action = function(t) seqorlive.seq:update()
-        if params:get("track active 1") == 1 then
-          gate_transport_1:start()
-          interval_transport_1:start()
-          octave_transport_1:start()
-        else
-          gate_transport_1:stop()
-          interval_transport_1:stop()
-          octave_transport_1:stop()
-        end
-        if params:get("track active 2") == 1 then
-          gate_transport_2:start()
-          interval_transport_2:start()
-          octave_transport_2:start()
-        else
-          gate_transport_2:stop()
-          interval_transport_2:stop()
-          octave_transport_2:stop()
-        end
-        if params:get("track active 3") == 1 then
-          gate_transport_3:start()
-          interval_transport_3:start()
-          octave_transport_3:start()
-        else
-          gate_transport_3:stop()
-          interval_transport_3:stop()
-          octave_transport_3:stop()
-        end
-        if params:get("track active 4") == 1 then
-          gate_transport_4:start()
-          interval_transport_4:start()
-          octave_transport_4:start()
-        else
-          gate_transport_4:stop()
-          interval_transport_4:stop()
-          octave_transport_4:stop()
-        end
-
         end,
-      division = 1 / 16
+      division = 1 / 32
     }
 
   meta_counter = 0
