@@ -759,7 +759,7 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = function(self)
-                        if i == params:get('current interval step 1') then return 15
+                        if i == params:get('current interval step 4') then return 15
                         else return 4 end
                     end,
                     controlspec = params:lookup_param('interval 4 ' ..i).controlspec,
