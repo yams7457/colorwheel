@@ -82,8 +82,13 @@ for i = 1,4,1 do
       queue_add_param{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 0 }
       queue_add_param{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 5, default = 1 }
       queue_add_param{ type = "number", id = "velocity " ..i .." "..j, name = "velocity " ..i .." "..j, min = 0, max = 127, default = 127 }
-      queue_add_param{ type = "number", id = "length " ..i .." "..j, name = "length " ..i .." "..j, min = 0, max = 5, default = 1 }
-      queue_add_param{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
+queue_add_param{ 
+  type = "option", 
+  id = "length " ..i .." "..j, 
+  name = "length " ..i .." "..j, 
+  options = {"1/4", "1/2", "1", "2", "4"}, 
+  default = 1 
+}      queue_add_param{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
       queue_add_param{ type = "number", id = "gate probability " ..i .." "..j, name = "gate probability " ..i .." "..j, min = 0, max = 100, default = 100 }
       queue_add_param{ type = "number", id = "interval probability " ..i .." "..j, name = "interval probability " ..i .." "..j, min = 0, max = 100, default = 100 }
       queue_add_param{ type = "number", id = "octave probability " ..i .." "..j, name = "octave probability " ..i .." "..j, min = 0, max = 100, default = 100 }
