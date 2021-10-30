@@ -18,6 +18,7 @@ function key(n,z)
     my_lattice:toggle()
   else if n == 2 and z == 1 then
     randomize()
+    print('randomizing!')
   end
   end
 end
@@ -38,6 +39,18 @@ function return_to_c()
     params:set('key', 0)
 end
 
+function restart_sequences()
+  for i = 1,4,1 do
+    params:set("current gate step " ..i, 0)
+    params:set("current interval step " ..i, 0)
+    params:set("current octave step " ..i, 0)
+    params:set("current velocity step " ..i, 0)
+    params:set("current length step " ..i, 0)
+  end 
+  print('back to the one!')
+  seqorlive.seq:update()
+  end
+
 function randomize()
 for i = 1,4,1
   do
@@ -51,7 +64,8 @@ params:set("velocity sequence start " ..i, math.random(1,8))
 params:set("gate sequence end " ..i, math.random(params:get("gate sequence start " ..i) + 3, 16))
 params:set("interval sequence end " ..i, math.random(params:get("interval sequence start " ..i) + 3, 16))
 params:set("octave sequence end " ..i, math.random (params:get("octave sequence start " ..i) + 3, 16))
-params:set("velocity sequence end " ..i, math.random (params:get("octave sequence end " ..i) + 3, 16))
+params:set("velocity sequence end " ..i, math.random (params:get("velocity sequence end " ..i) + 3, 16))
+params:set("length sequence end " ..i, math.random (params:get("length sequence end " ..i) + 3, 16))
 params:set("offset " ..i, (params:get("offset " ..i) + math.random(-1,1) - 1) % 5 + 1)
 params:set("transposition " ..i, ((params:get("transposition " ..i) + (math.random(-1, 1)) + 2) % 5 - 2))
 
@@ -70,6 +84,7 @@ function clock_sync()
      params:set("interval div " ..i, 1)
      params:set("octave div " ..i, 1)
   end
+  print('clocks aligned!')
   end
 
 seqorlive = nest_ {
@@ -476,8 +491,8 @@ range_display_7 = nest_(16):each(function(i,v)
                     y = {1, 5},
                     level = {0, 6},
                     controlspec = params:lookup_param('gate probability 1 ' ..i).controlspec,
-                    value = function() return params:get('gate probability 1 ' ..i) / 25 end,
-                    action = function(s, v) params:set('gate probability 1 ' ..i, v * 25) end,
+                    value = function() return params:get('gate probability 1 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('gate probability 1 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and
                             seqorlive.seq.time_mod.value == 0 and
@@ -492,6 +507,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('gate probability 2 ' ..i).controlspec,
+                    value = function() return params:get('gate probability 2 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('gate probability 2 ' ..i, (v - 1) * 25) end,
 
                 enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and
@@ -507,7 +525,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
-
+                    controlspec = params:lookup_param('gate probability 3 ' ..i).controlspec,
+                    value = function() return params:get('gate probability 3 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('gate probability 3 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and
                             seqorlive.seq.time_mod.value == 0 and
@@ -522,7 +542,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
-
+                    controlspec = params:lookup_param('gate probability 4 ' ..i).controlspec,
+                    value = function() return params:get('gate probability 4 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('gate probability 4 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.loop_mod.value == 0 and
                             seqorlive.seq.time_mod.value == 0 and
@@ -587,6 +609,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('interval probability 1 ' ..i).controlspec,
+                    value = function() return params:get('interval probability 1 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('interval probability 1 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -652,6 +677,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('interval probability 2 ' ..i).controlspec,
+                    value = function() return params:get('interval probability 2 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('interval probability 2 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -715,6 +743,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('interval probability 3 ' ..i).controlspec,
+                    value = function() return params:get('interval probability 3 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('interval probability 3 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -777,6 +808,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('interval probability 4 ' ..i).controlspec,
+                    value = function() return params:get('interval probability 4 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('interval probability 4 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -840,6 +874,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('octave probability 1 ' ..i).controlspec,
+                    value = function() return params:get('octave probability 1 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('octave probability 1 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -919,6 +956,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('octave probability 2 ' ..i).controlspec,
+                    value = function() return params:get('octave probability 2 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('octave probability 2 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -997,6 +1037,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('octave probability 3 ' ..i).controlspec,
+                    value = function() return params:get('octave probability 3 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('octave probability 3 ' ..i, (v - 1) * 25) end,
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -1071,6 +1114,9 @@ range_display_7 = nest_(16):each(function(i,v)
                     x = i,
                     y = {1, 5},
                     level = {0, 6},
+                    controlspec = params:lookup_param('octave probability 4 ' ..i).controlspec,
+                    value = function() return params:get('octave probability 4 ' ..i) / 25 + 1 end,
+                    action = function(s, v) params:set('octave probability 4 ' ..i, (v - 1) * 25) end,                    
                     enabled = function(self)
                         return (seqorlive.seq.prob_mod.value == 1)
                         end
@@ -1147,6 +1193,9 @@ range_display_7 = nest_(16):each(function(i,v)
                 x = i,
                 y = {1, 5},
                 level = {0, 6},
+                controlspec = params:lookup_param('velocity probability 1 ' ..i).controlspec,
+                value = function() return params:get('velocity probability 1 ' ..i) / 25 + 1 end,
+                action = function(s, v) params:set('velocity probability 1 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.prob_mod.value == 1)
                     end
@@ -1212,6 +1261,9 @@ enabled = function(self)
                 x = i,
                 y = {1, 5},
                 level = {0, 6},
+                controlspec = params:lookup_param('velocity probability 2 ' ..i).controlspec,
+                value = function() return params:get('velocity probability 2 ' ..i) / 25 + 1 end,
+                action = function(s, v) params:set('velocity probability 2 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.prob_mod.value == 1)
                     end
@@ -1275,6 +1327,9 @@ enabled = function(self)
                 x = i,
                 y = {1, 5},
                 level = {0, 6},
+                controlspec = params:lookup_param('velocity probability 3 ' ..i).controlspec,
+                value = function() return params:get('velocity probability 3 ' ..i) / 25 + 1 end,
+                action = function(s, v) params:set('velocity probability 3 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.prob_mod.value == 1)
                     end
@@ -1337,6 +1392,9 @@ enabled = function(self)
                 x = i,
                 y = {1, 5},
                 level = {0, 6},
+                controlspec = params:lookup_param('velocity probability 4 ' ..i).controlspec,
+                value = function() return params:get('velocity probability 4 ' ..i) / 25 + 1 end,
+                action = function(s, v) params:set('velocity probability 4 ' ..i, (v - 1) * 25) end,
                 enabled = function(self)
                     return (seqorlive.seq.prob_mod.value == 1)
                     end
@@ -1401,6 +1459,9 @@ length_tab_1 = nest_ {
               x = i,
               y = {1, 5},
               level = {0, 6},
+              controlspec = params:lookup_param('length probability 1 ' ..i).controlspec,
+              value = function() return params:get('length probability 1 ' ..i) / 25 + 1 end,
+              action = function(s, v) params:set('length probability 1 ' ..i, (v - 1) * 25) end,
               enabled = function(self)
                   return (seqorlive.seq.prob_mod.value == 1)
                   end
@@ -1467,6 +1528,9 @@ enabled = function(self)
               x = i,
               y = {1, 5},
               level = {0, 6},
+              controlspec = params:lookup_param('length probability 2 ' ..i).controlspec,
+              value = function() return params:get('length probability 2 ' ..i) / 25 + 1 end,
+              action = function(s, v) params:set('length probability 2 ' ..i, (v - 1) * 25) end,
               enabled = function(self)
                   return (seqorlive.seq.prob_mod.value == 1)
                   end
@@ -1531,6 +1595,9 @@ enabled = function(self)
               x = i,
               y = {1, 5},
               level = {0, 6},
+              controlspec = params:lookup_param('length probability 3 ' ..i).controlspec,
+              value = function() return params:get('length probability 3 ' ..i) / 25 + 1 end,
+              action = function(s, v) params:set('length probability 3 ' ..i, (v - 1) * 25) end,
               enabled = function(self)
                   return (seqorlive.seq.prob_mod.value == 1)
                   end
@@ -1594,6 +1661,9 @@ enabled = function(self)
               x = i,
               y = {1, 5},
               level = {0, 6},
+              controlspec = params:lookup_param('length probability 4 ' ..i).controlspec,
+              value = function() return params:get('length probability 4 ' ..i) / 25 + 1 end,
+              action = function(s, v) params:set('length probability 4 ' ..i, (v - 1) * 25) end,
               enabled = function(self)
                   return (seqorlive.seq.prob_mod.value == 1)
                   end
@@ -1667,6 +1737,18 @@ enabled = function(self)
       level = {5, 15},
       value = 0,
       action = function () if seqorlive.clock_sync.value == 1 then clock_sync() end end,
+      enabled = function(self)
+                return (seqorlive.meta.value == 1)
+                end
+      
+    },
+  
+    restart_sequences = _grid.momentary{
+      x = 4,
+      y = 7,
+      level = {5, 15},
+      value = 0,
+      action = function () if seqorlive.restart_sequences.value == 1 then restart_sequences() end end,
       enabled = function(self)
                 return (seqorlive.meta.value == 1)
                 end
@@ -1816,11 +1898,19 @@ enabled = function(self)
 
                   params:set('octave sequence start ' ..i, params:get('meta loop start'))
                   
+                  params:set('velocity sequence start ' ..i, params:get('meta loop start'))
+                  
+                  params:set('length sequence start ' ..i, params:get('meta loop start'))
+                  
                   params:set('gate sequence end ' ..i, params:get('meta loop end'))
                   
                   params:set('interval sequence end ' ..i, params:get('meta loop end'))
 
                   params:set('octave sequence end ' ..i, params:get('meta loop end'))
+                  
+                  params:set('velocity sequence end ' ..i, params:get('meta loop end'))
+                  
+                  params:set('length sequence end ' ..i, params:get('meta loop end'))
                   end
                 end,
             },
@@ -1855,11 +1945,19 @@ enabled = function(self)
 
                   params:set('octave sequence start ' ..i, params:get('meta loop start'))
                   
+                  params:set('velocity sequence start ' ..i, params:get('meta loop start'))
+                  
+                  params:set('length sequence start ' ..i, params:get('meta loop start'))
+                  
                   params:set('gate sequence end ' ..i, params:get('meta loop end'))
                   
                   params:set('interval sequence end ' ..i, params:get('meta loop end'))
 
                   params:set('octave sequence end ' ..i, params:get('meta loop end'))
+                  
+                  params:set('velocity sequence end ' ..i, params:get('meta loop end'))
+                  
+                  params:set('length sequence end ' ..i, params:get('meta loop end'))
                   end
                   end
               

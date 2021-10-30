@@ -92,6 +92,8 @@ queue_add_param{
       queue_add_param{ type = "number", id = "gate probability " ..i .." "..j, name = "gate probability " ..i .." "..j, min = 0, max = 100, default = 100 }
       queue_add_param{ type = "number", id = "interval probability " ..i .." "..j, name = "interval probability " ..i .." "..j, min = 0, max = 100, default = 100 }
       queue_add_param{ type = "number", id = "octave probability " ..i .." "..j, name = "octave probability " ..i .." "..j, min = 0, max = 100, default = 100 }
+      queue_add_param{ type = "number", id = "velocity probability " ..i .." "..j, name = "velocity probability " ..i .." "..j, min = 0, max = 100, default = 100 }
+      queue_add_param{ type = "number", id = "length probability " ..i .." "..j, name = "velocity probability " ..i .." " ..j, min = 0, max = 100, default = 100 }
     end
 
 dequeue_param_group("steps " ..i)
@@ -322,31 +324,32 @@ end
       current_channel[i] = params:get("midi channel " ..i)
             if  i == 1 then
         if
-        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], params:get("velocity 1 " ..params:get("current velocity step 1")), current_channel[i], 1) end
+        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], params:get("velocity 1 " ..params:get("current velocity step 1")), length_values[params:get("length 1 " ..params:get("current length step 1"))], current_channel[i], 1) end
       elseif i == 2 then
         if
-        params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], 127, current_channel[i], 2)end
+        params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], params:get("velocity 2 " ..params:get("current velocity step 2")), length_values[params:get("length 2 " ..params:get("current length step 2"))]
+, current_channel[i], 2)end
       elseif i == 3 then
         if
-        params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], 127, current_channel[i], 3) end
+        params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], params:get("velocity 3 " ..params:get("current velocity step 3")), length_values[params:get("length 3 " ..params:get("current length step 3"))]
+, current_channel[i], 3) end
       elseif i == 4 then
         if
-        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], 127, current_channel[i], 4) end
+        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], params:get("velocity 4 " ..params:get("current velocity step 4")), length_values[params:get("length 4 " ..params:get("current length step 4"))], current_channel[i], 4) end
       end
 
 end
 
-function play(note, vel, channel, track)
+function play(note, vel, length, channel, track)
   if math.random(0, 100) <= params:get('probability ' ..track) then
   if math.random(0,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
   m:note_on(note, vel, channel)
-    print(vel)
   end end
-  note_off(note, vel, channel)
+  note_off(note, vel, length, channel)
 end
 
-function note_off(note, vel, channel)
-      clock.sync(1/4)
+function note_off(note, vel, length, channel)
+      clock.sync(length)
        m:note_off(note, vel, channel)
 end
 
