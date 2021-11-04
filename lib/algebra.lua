@@ -390,10 +390,11 @@ function play(note, vel, length, channel, track)
   if math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 then
   if math.random(1,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
   m:note_on(note, vel, channel)
+  print(params:get("current interval step 1"))
+  print(params:get("current gate step 1"))
+  print('hey!')
   end end
-  note_off(note, vel, length, channel)
   clock.run(note_off, note, vel, length, channel, track)
-  print(current_interval_1)
 end
 
 function note_off(note, vel, length, channel)
