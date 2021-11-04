@@ -21,6 +21,7 @@ function key(n,z)
     print('randomizing!')
   end
   end
+  seqorlive.seq:update()
 end
 
 function down_a_fifth()
@@ -64,8 +65,8 @@ params:set("velocity sequence start " ..i, math.random(1,8))
 params:set("gate sequence end " ..i, math.random(params:get("gate sequence start " ..i) + 3, 16))
 params:set("interval sequence end " ..i, math.random(params:get("interval sequence start " ..i) + 3, 16))
 params:set("octave sequence end " ..i, math.random (params:get("octave sequence start " ..i) + 3, 16))
-params:set("velocity sequence end " ..i, math.random (params:get("velocity sequence end " ..i) + 3, 16))
-params:set("length sequence end " ..i, math.random (params:get("length sequence end " ..i) + 3, 16))
+params:set("velocity sequence end " ..i, math.random (params:get("velocity sequence start " ..i) + 3, 16))
+params:set("length sequence end " ..i, math.random (params:get("length sequence start " ..i) + 3, 16))
 params:set("offset " ..i, (params:get("offset " ..i) + math.random(-1,1) - 1) % 5 + 1)
 params:set("transposition " ..i, ((params:get("transposition " ..i) + (math.random(-1, 1)) + 2) % 5 - 2))
 
@@ -143,23 +144,6 @@ seq = nest_ {
                   controlspec = params:lookup_param('track active ' ..i).controlspec,
                   value = function() return params:get('track active ' ..i) end,
                   action = function(s,v,x) params:set('track active ' ..i, v)
-                    if x == 1 then
-                    gate_transport_1:toggle()
-                    interval_transport_1:toggle()
-                    octave_transport_1:toggle()
-                    elseif x == 2 then
-                    gate_transport_2:toggle()
-                    interval_transport_2:toggle()
-                    octave_transport_2:toggle()
-                    elseif x == 3 then
-                    gate_transport_3:toggle()
-                    interval_transport_3:toggle()
-                    octave_transport_3:toggle()
-                    elseif x == 4 then
-                    gate_transport_4:toggle()
-                    interval_transport_4:toggle()
-                    octave_transport_4:toggle()
-                    end
                     end,
 
                   enabled = function(self)
@@ -1180,7 +1164,7 @@ range_display_7 = nest_(16):each(function(i,v)
                 end,
                 controlspec = params:lookup_param('velocity 1 ' ..i).controlspec,
                 value = function() return math.floor( params:get('velocity 1 ' ..i) / 32 + 1.5) end,
-                action = function(s, v) params:set('velocity 1 ' ..i, velocity_values[v]) print(params:get('velocity 1 ' ..i)) end,
+                action = function(s, v) params:set('velocity 1 ' ..i, velocity_values[v]) end,
                 enabled = function(self)
                     return (seqorlive.seq.prob_mod.value == 0)
                     end
@@ -1248,7 +1232,7 @@ velocity_tab_2 = nest_ {
                 end,
 controlspec = params:lookup_param('velocity 2 ' ..i).controlspec,
 value = function() return math.floor( params:get('velocity 2 ' ..i) / 32 + 1.5) end,
-action = function(s, v) params:set('velocity 2 ' ..i, velocity_values[v]) print(params:get('velocity 2 ' ..i)) end,
+action = function(s, v) params:set('velocity 2 ' ..i, velocity_values[v]) end,
 enabled = function(self)
     return (seqorlive.seq.prob_mod.value == 0)
     end
@@ -1314,7 +1298,7 @@ velocity_tab_3 = nest_ {
                 end,
 controlspec = params:lookup_param('velocity 3 ' ..i).controlspec,
 value = function() return math.floor( params:get('velocity 3 ' ..i) / 32 + 1.5) end,
-action = function(s, v) params:set('velocity 3 ' ..i, velocity_values[v]) print(params:get('velocity 3 ' ..i)) end,
+action = function(s, v) params:set('velocity 3 ' ..i, velocity_values[v]) end,
 enabled = function(self)
     return (seqorlive.seq.prob_mod.value == 0)
     end
@@ -1379,7 +1363,7 @@ enabled = function(self)
                 end,
 controlspec = params:lookup_param('velocity 4 ' ..i).controlspec,
 value = function() return math.floor( params:get('velocity 4 ' ..i) / 32 + 1.5) end,
-action = function(s, v) params:set('velocity 4 ' ..i, velocity_values[v]) print(params:get('velocity 4 ' ..i)) end,
+action = function(s, v) params:set('velocity 4 ' ..i, velocity_values[v]) end,
 enabled = function(self)
     return (seqorlive.seq.prob_mod.value == 0)
     end
@@ -2119,7 +2103,11 @@ length_transport_3 = my_lattice:new_pattern{
         end,
       division = 1 / 32
     }
-
+  
   meta_counter = 0
   my_lattice:start()
-  seqorlive:init() end
+  my_lattice:toggle()
+  restart_sequences()
+  seqorlive:init() 
+  seqorlive.seq:update()
+  end
