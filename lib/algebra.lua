@@ -173,12 +173,6 @@ elseif params:get("current interval step " ..i) == params:get("interval sequence
 
   params:set(("current interval step " ..i), params:get("current interval step " ..i) + 1)
 
-elseif params:get("current interval step " ..i) > params:get("interval sequence end " ..i)
-
-  then
-
-  params:set(("current interval step " ..i), params:get("interval sequence start " ..i))
-
 end
 end
 
@@ -292,33 +286,32 @@ function tick(i)
     local current_inner_index = {}
     local current_octave = {}
     local current_offset = {}
-  if (params:get("gate sequence start " ..i) < params:get("current gate step " ..i)) and (params:get("current gate step " ..i) < params:get("gate sequence end " ..i))
+if (params:get("gate sequence start " ..i) < params:get("current gate step " ..i)) and (params:get("current gate step " ..i) < params:get("gate sequence end " ..i))
 
-    then
+	then
 
-    params:set(("current gate step " ..i), params:get("current gate step " ..i) + 1)
+	params:set(("current gate step " ..i), params:get("current gate step " ..i) + 1)
 
-  elseif params:get("current gate step " ..i) >= params:get("gate sequence end " ..i)
+elseif params:get("current gate step " ..i) >= params:get("gate sequence end " ..i)
 
-    then
+	then
 
-    params:set(("current gate step " ..i), params:get("gate sequence start " ..i))
+	params:set(("current gate step " ..i), params:get("gate sequence start " ..i))
 
-  elseif params:get("current gate step " ..i) < params:get("gate sequence start " ..i)
+elseif params:get("current gate step " ..i) < params:get("gate sequence start " ..i)
 
-    then
+	then
 
-    params:set(("current gate step " ..i), params:get("gate sequence start " ..i))
+	params:set(("current gate step " ..i), params:get("gate sequence start " ..i))
 
-  elseif params:get("current gate step " ..i) == params:get("gate sequence start " ..i)
+elseif params:get("current gate step " ..i) == params:get("gate sequence start " ..i)
 
-    then
+	then
 
-    params:set(("current gate step " ..i), params:get("current gate step " ..i) + 1)
-
-params:get("gate sequence end " ..i)
+	params:set(("current gate step " ..i), params:get("current gate step " ..i) + 1)
 
 end
+
       local outer_index = 1 + params:get("transpose")
       local carving = params:get("carving " ..i) * 7
       if math.random(1,100) <= params:get("interval probability " ..i .." " .. params:get("current interval step " ..i)) then
@@ -383,16 +376,15 @@ elseif i == 3 then
   previous_interval_3 = interval
 elseif i == 4 then
   previous_interval_4 = interval
-  end
+end
+
+  print(params:get("current interval step 1"), params:get("current gate step 1"))
 end
 
 function play(note, vel, length, channel, track)
   if math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 then
   if math.random(1,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
   m:note_on(note, vel, channel)
-  print(params:get("current interval step 1"))
-  print(params:get("current gate step 1"))
-  print('hey!')
   end end
   clock.run(note_off, note, vel, length, channel, track)
 end
