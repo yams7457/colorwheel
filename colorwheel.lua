@@ -43,10 +43,10 @@ end
 function restart_sequences()
   for i = 1,4,1 do
     params:set("current gate step " ..i, 0)
-    params:set("current interval step " ..i, 0)
-    params:set("current octave step " ..i, 0)
-    params:set("current velocity step " ..i, 0)
-    params:set("current length step " ..i, 0)
+    params:set("current interval step " ..i, 2)
+    params:set("current octave step " ..i, 2)
+    params:set("current velocity step " ..i, 2)
+    params:set("current length step " ..i, 2)
   end 
   print('back to the one!')
   seqorlive.seq:update()

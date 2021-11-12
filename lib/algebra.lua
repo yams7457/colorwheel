@@ -378,7 +378,6 @@ elseif i == 4 then
   previous_interval_4 = interval
 end
 
-  print(params:get("current interval step 1"), params:get("current gate step 1"))
 end
 
 function play(note, vel, length, channel, track)
@@ -387,6 +386,7 @@ function play(note, vel, length, channel, track)
   m:note_on(note, vel, channel)
   end end
   clock.run(note_off, note, vel, length, channel, track)
+  print(note, track)
 end
 
 function note_off(note, vel, length, channel)
