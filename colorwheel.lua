@@ -1,3 +1,12 @@
+-- RGB in this emmer effer
+--
+-- k2 to randomize
+-- k3 to spin that shit
+--
+-- or stop it spinning
+-- 
+-- for if you get the spins
+
 include 'lib/core'
 include 'lib/norns'
 include 'lib/grid'
@@ -1953,9 +1962,22 @@ enabled = function(self)
     
  }}
 
+function redraw()
+      screen.move(0, 10)
+      screen.font_size(8)
+    screen.text("You are now spinning" )
+    screen.move(20,37)
+    screen.font_size(16)
+    screen.text("colorwheel")
+    screen.move(0, 60)
+    screen.font_size(8)
+    screen.text("the wheeeeeeeeeeel of color.")
+    screen.update()
+end
+
 seqorlive:connect { g = grid.connect() }
 function init()
-  
+    screen.clear()
     algebra.init()
     my_lattice = lattice:new()
     ppqn = 16
