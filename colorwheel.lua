@@ -43,11 +43,9 @@ end
 
 function return_to_root()
     params:set('transpose', 0)
+    print("Live transposition nullified!")
 end
 
-function return_to_c()
-    params:set('key', 0)
-end
 
 function restart_sequences()
   for i = 1,4,1 do
@@ -1713,16 +1711,18 @@ enabled = function(self)
       
     },
   
-    --return_to_root = _grid.momentary{
-      --x = 3,
---      y = 8,
---      level = 15,
---      value = 0,
---      action = function () if seqorlive.return_to_root.value == 1 then return_to_root() end end,
---      enabled = function(self)
---              return (seqorlive.meta.value == 2)
---              end
---    },
+    return_to_root = _grid.momentary{
+      x = 5,
+      y = 7,
+      level = {5, 15},
+      value = 0,
+      action = function () if seqorlive.return_to_root.value == 1 then 
+          return_to_root() 
+        end end,
+      enabled = function(self)
+              return (seqorlive.meta.value == 1)
+              end
+    },
     
     clock_sync = _grid.momentary{
       x = 3,

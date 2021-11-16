@@ -100,6 +100,7 @@ dequeue_param_group("steps " ..i)
 
 end
 
+
 step = 0
 
 collection_0 =
@@ -131,6 +132,33 @@ previous_interval_2 = 1
 previous_interval_3 = 1
 previous_interval_4 = 1
 current_octave = {}
+current_octave_1 = 1
+current_octave_2 = 1
+current_octave_3 = 1
+current_octave_4 = 1
+previous_octave_1 = 1
+previous_octave_2 = 1
+previous_octave_3 = 1
+previous_octave_4 = 1
+
+current_velocity_1 = 1
+current_velocity_2 = 1
+current_velocity_3 = 1
+current_velocity_4 = 1
+previous_velocity_1 = 1
+previous_velocity_2 = 1
+previous_velocity_3 = 1
+previous_velocity_4 = 1
+
+current_length_1 = 1
+current_length_2 = 1
+current_length_3 = 1
+current_length_4 = 1
+previous_length_1 = 1
+previous_length_2 = 1
+previous_length_3 = 1
+previous_length_4 = 1
+
 current_velocity = {}
 current_length = {}
 current_note = {}
@@ -314,7 +342,8 @@ end
 
       local outer_index = 1 + params:get("transpose")
       local carving = params:get("carving " ..i) * 7
-      if math.random(1,100) <= params:get("interval probability " ..i .." " .. params:get("current interval step " ..i)) then
+      
+      if math.random(1,100) <= params:get("interval probability " ..i .." " .. params:get("current interval step " ..i)) and params:get("gate " ..i .." " ..params:get("current gate step " ..i)) == 1 then
       if i == 1 then
       current_interval_1 = params:get("interval " .. i .. " " .. params:get("current interval step " ..i))
       elseif i == 2 then
@@ -338,45 +367,129 @@ end
       elseif i == 3 then interval = current_interval_3
       elseif i == 4 then interval = current_interval_4
       end
+      
+      if math.random(1,100) <= params:get("octave probability " ..i .." " .. params:get("current octave step " ..i)) and params:get("gate " ..i .." " ..params:get("current gate step " ..i)) == 1 then
+
+          if i == 1 then
+              current_octave_1 = params:get("track octave " ..i) + params:get("octave " .. i .. " " .. params:get("current octave step " ..i))
+              elseif i == 2 then
+              current_octave_2 = params:get("track octave " ..i) + params:get("octave " .. i .. " " .. params:get("current octave step " ..i))
+              elseif i == 3 then
+              current_octave_3 = params:get("track octave " ..i) + params:get("octave " .. i .. " " .. params:get("current octave step " ..i))
+              elseif i == 4 then
+              current_octave_4 = params:get("track octave " ..i) + params:get("octave " .. i .. " " .. params:get("current octave step " ..i))
+          end
+          
+          elseif i == 1 then
+          current_octave_1 = previous_octave_1
+          elseif i == 2 then
+          current_octave_2 = previous_octave_2
+          elseif i == 3 then
+          current_octave_3 = previous_octave_3
+          elseif i == 4 then
+          current_octave_4 = previous_octave_4
+        
+      end
+      
+      if i == 1 then octave = current_octave_1
+          elseif i == 2 then octave = current_octave_2
+          elseif i == 3 then octave = current_octave_3
+          elseif i == 4 then octave = current_octave_4
+          end
+    
+    if math.random(1,100) <= params:get("length probability " ..i .." " .. params:get("current length step " ..i)) and params:get("gate " ..i .." " ..params:get("current gate step " ..i)) == 1 then
+if i == 1 then
+current_length_1 = params:get("length " .. i .. " " .. params:get("current length step " ..i))
+elseif i == 2 then
+  current_length_2 = params:get("length " .. i .. " " .. params:get("current length step " ..i))
+elseif i == 3 then
+  current_length_3 = params:get("length " .. i .. " " .. params:get("current length step " ..i))
+elseif i == 4 then
+  current_length_4 = params:get("length " .. i .. " " .. params:get("current length step " ..i))
+end
+elseif i == 1 then
+current_length_1 = previous_length_1
+elseif i == 2 then
+current_length_2 = previous_length_2
+elseif i == 3 then
+current_length_3 = previous_length_3
+elseif i == 4 then
+current_length_4 = previous_length_4
+end
+if i == 1 then length = current_length_1
+elseif i == 2 then length = current_length_2
+elseif i == 3 then length = current_length_3
+elseif i == 4 then length = current_length_4
+end
+
+if math.random(1,100) <= params:get("velocity probability " ..i .." " .. params:get("current velocity step " ..i)) and params:get("gate " ..i .." " ..params:get("current gate step " ..i)) == 1 then
+if i == 1 then
+current_velocity_1 = params:get("velocity " .. i .. " " .. params:get("current velocity step " ..i))
+elseif i == 2 then
+  current_velocity_2 = params:get("velocity " .. i .. " " .. params:get("current velocity step " ..i))
+elseif i == 3 then
+  current_velocity_3 = params:get("velocity " .. i .. " " .. params:get("current velocity step " ..i))
+elseif i == 4 then
+  current_velocity_4 = params:get("velocity " .. i .. " " .. params:get("current velocity step " ..i))
+end
+elseif i == 1 then
+current_velocity_1 = previous_velocity_1
+elseif i == 2 then
+current_velocity_2 = previous_velocity_2
+elseif i == 3 then
+current_velocity_3 = previous_velocity_3
+elseif i == 4 then
+current_velocity_4 = previous_velocity_4
+end
+if i == 1 then velocity = current_velocity_1
+elseif i == 2 then velocity = current_velocity_2
+elseif i == 3 then velocity = current_velocity_3
+elseif i == 4 then velocity = current_velocity_4
+end
+      
       local inner_index = (carving + interval)
       current_inner_index[i] = inner_index
       current_interval[i] = params:get("offset") + (params:get('key') + (collection_0[outer_index][inner_index] + 24) + ( 7 * params:get("transposition " ..i))) % 12
-      current_octave[i] = (params:get("track octave " ..i) + params:get("octave " ..i .. " " .. params:get("current octave step " ..i))) * 12
       current_offset[i] = offset_list[params:get("offset mode")][params:get("offset " ..i)]
-      current_note[i] = current_interval[i] + current_octave[i] + current_offset[i]
+      current_note[i] = current_interval[i] + octave * 12 + current_offset[i]
       current_channel[i] = params:get("midi channel " ..i)
             if  i == 1 then
         if
-        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], params:get("velocity 1 " ..params:get("current velocity step 1")), length_values[params:get("length 1 " ..params:get("current length step 1"))], current_channel[i], 1)
+        params:get("gate 1 " ..params:get("current gate step 1")) == 1 then play(current_note[i], velocity, length_values[length], current_channel[i], 1)
           end
               previous_interval_1 = current_interval_1
+              previous_octave_1 = current_octave_1
+              previous_length_1 = current_length_1
+              previous_velocity_1 = current_velocity_1
       elseif i == 2 then
         if
-        params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], params:get("velocity 2 " ..params:get("current velocity step 2")), length_values[params:get("length 2 " ..params:get("current length step 2"))]
+        params:get("gate 2 " ..params:get("current gate step 2")) == 1 then play(current_note[i], velocity, length_values[length]
 , current_channel[i], 2)
       end
-            previous_interval_2 = current_interval_2
+previous_interval_2 = current_interval_2
+previous_octave_2 = current_octave_2
+previous_length_2 = current_length_2
+previous_velocity_2 = current_velocity_2
+
       elseif i == 3 then
         if
-        params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], params:get("velocity 3 " ..params:get("current velocity step 3")), length_values[params:get("length 3 " ..params:get("current length step 3"))]
+        params:get("gate 3 " ..params:get("current gate step 3")) == 1 then play(current_note[i], velocity, length_values[length]
 , current_channel[i], 3) 
       end
-      previous_interval_3 = current_interval_3
+previous_interval_3 = current_interval_3
+previous_octave_3 = current_octave_3
+previous_length_3 = current_length_3
+previous_velocity_3 = current_velocity_3
+
       elseif i == 4 then
         if
-        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], params:get("velocity 4 " ..params:get("current velocity step 4")), length_values[params:get("length 4 " ..params:get("current length step 4"))], current_channel[i], 4) end
-      previous_interval_4 = current_interval_4
-      end
+        params:get("gate 4 " ..params:get("current gate step 4")) == 1 then play(current_note[i], velocity, length_values[length], current_channel[i], 4) end
+previous_interval_4 = current_interval_4
+previous_octave_4 = current_octave_4
+previous_length_4 = current_length_4
+previous_velocity_4 = current_velocity_4
 
-if i == 1 then
-  previous_interval_1 = interval
-elseif i == 2 then
-  previous_interval_2 = interval
-elseif i == 3 then
-  previous_interval_3 = interval
-elseif i == 4 then
-  previous_interval_4 = interval
-end
+      end
 
 end
 
@@ -386,7 +499,7 @@ function play(note, vel, length, channel, track)
   m:note_on(note, vel, channel)
   end end
   clock.run(note_off, note, vel, length, channel, track)
-  print(note, track)
+  print(velocity, current_velocity_1, previous_velocity_1, current_velocity_2, previous_velocity_2)
 end
 
 function note_off(note, vel, length, channel)
