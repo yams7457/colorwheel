@@ -2003,7 +2003,7 @@ function init()
   }
 
     gate_transport_4 = my_lattice:new_pattern{
-      action = function(t) tick (4)
+      action = function(t) tick(4)
         gate_transport_4.division = params:get('gate div 4') / 16
         end,
       division = params:get('gate div 4') / 16
@@ -2059,7 +2059,7 @@ octave_transport_2 = my_lattice:new_pattern{
 }
 
   octave_transport_4 = my_lattice:new_pattern{
-    action = function(t) octave_tick (4)
+    action = function(t) octave_tick(4)
       octave_transport_4.division = params:get('octave div 4') / 16
       end,
     division = params:get('octave div 4') / 16
@@ -2087,7 +2087,7 @@ velocity_transport_2 = my_lattice:new_pattern{
 }
 
   velocity_transport_4 = my_lattice:new_pattern{
-    action = function(t) velocity_tick (4)
+    action = function(t) velocity_tick(4)
       velocity_transport_4.division = params:get('velocity div 4') / 16
       end,
     division = params:get('velocity div 4') / 16
@@ -2115,7 +2115,7 @@ length_transport_3 = my_lattice:new_pattern{
 }
 
   length_transport_4 = my_lattice:new_pattern{
-    action = function(t) length_tick (4)
+    action = function(t) length_tick(4)
       length_transport_4.division = params:get('length div 4') / 16
       end,
     division = params:get('length div 4') / 16
