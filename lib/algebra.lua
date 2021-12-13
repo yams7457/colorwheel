@@ -72,6 +72,9 @@ queue_add_param{ type = "number", id = "current length step " ..i, name = "curre
 
   dequeue_param_group("track " ..i)
   params:set_action("output "..i, function(param)
+    if param == JF_VOICE then
+      crow.ii.jf.mode(1)
+    end
     if not currently_banging then
       currently_banging = true
       params:bang()

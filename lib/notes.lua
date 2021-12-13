@@ -1,9 +1,10 @@
 Voice = require("lib/voice")
 
-VOICES = {"midi", "w/syn"}
+VOICES = {"midi", "w/syn", "just friends"}
 
 MIDI_VOICE = 1
 WSYN_VOICE = 2
+JF_VOICE = 3
 
 notes = {}
 
@@ -34,6 +35,9 @@ end
 WSYN_SUSTAIN_MONO = 1
 WSYN_SUSTAIN_STEAL = 2
 WSYN_PLUCK = 3
+
+JF_SUSTAIN_MONO = 1
+JF_SUSTAIN_STEAL = 2
 
 
 
@@ -146,6 +150,10 @@ function notes.init()
   params:set_action("w/lpg_symmetry", ifoutput(WSYN_VOICE, function(param)
     crow.ii.wsyn.lpg_symmetry(param)
   end))
+  
+  params:add_group("just friends", 1)
+  params:add_option("jf/style", "style", {"voice/track", "dynamic poly"}, 1)
+
 end
 
 m = midi.connect()
@@ -194,9 +202,47 @@ function wsyn_player:play_note(note, vel, length, channel, track)
   end
 end
 
+jf_player = {
+  channel_map={0, 0, 0, 0, 0, 0},
+  allocator=Voice.new(6, Voice.LRU),
+}
+
+function jf_player:play_note(note, vel, length, channel, track)
+  local v8 = (note - 60)/12
+  local v_vel = (vel/127) * 5
+  if params:get("jf/style") == JF_SUSTAIN_MONO then
+    crow.ii.jf.play_voice(track, v8, v_vel)
+    local index = self.channel_map[track] + 1
+    self.channel_map[track] = index
+    clock.run(function() 
+      clock.sleep(clock.get_beat_sec() * length)
+      if self.channel_map[track] == index then
+        crow.ii.jf.trigger(track, 0)
+      end
+    end)
+  elseif params:get("jf/style") == JF_SUSTAIN_STEAL then
+    local slot = self.allocator:get()
+    local index = self.channel_map[slot.id] + 1
+    self.channel_map[slot.id] = index
+    crow.ii.jf.play_voice(slot.id, v8, v_vel)
+    slot.on_release = function(slot)
+      if self.channel_map[slot.id] == index then
+        crow.ii.jf.trigger(slot.id, 0)
+      end
+    end
+    clock.run(function() 
+      clock.sleep(clock.get_beat_sec() * length)
+      self.allocator:release(slot)
+    end)
+  else
+    crow.ii.jf.play_note(v8, v_vel)
+  end
+end
+
 notes.play = {
   play_midi_note,
   function (...) wsyn_player:play_note(...) end,
+  function (...) jf_player:play_note(...) end,
 }
 
 function midi_note_off(note, vel, length, channel)
