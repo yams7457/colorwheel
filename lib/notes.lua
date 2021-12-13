@@ -1,3 +1,5 @@
+Voice = require("lib/voice")
+
 VOICES = {"midi", "w/syn"}
 
 MIDI_VOICE = 1
@@ -29,8 +31,9 @@ function ifoutput(opt, f)
   end
 end
 
-WSYN_SUSTAIN = 1
-WSYN_PLUCK = 2
+WSYN_SUSTAIN_MONO = 1
+WSYN_SUSTAIN_STEAL = 2
+WSYN_PLUCK = 3
 
 
 
@@ -94,9 +97,13 @@ function notes.init()
 
   params:add_group("w/syn",9)
   
-  params:add_option("w/style", "style", {"sustain", "pluck"}, 1)
+  params:add_option("w/style", "style", {"voice/track", "dynamic poly", "pluck"}, 1)
   params:set_action("w/style", ifoutput(WSYN_VOICE, function (param)
-    crow.ii.wsyn.ar_mode(param - 1)
+    if param == WSYN_PLUCK then
+      crow.ii.wsyn.ar_mode(1)
+    else
+      crow.ii.wsyn.ar_mode(0)
+    end 
     crow.ii.wsyn.voices(4)
   end))
   
@@ -150,14 +157,37 @@ function play_midi_note(note, vel, length, channel, track)
   clock.run(midi_note_off, note, vel, length, channel, track)
 end
 
-function play_wsyn_note(note, vel, length, channel, track)
+wsyn_player = {
+  channel_map={0, 0, 0, 0},
+  allocator=Voice.new(4, Voice.LRU),
+}
+
+function wsyn_player:play_note(note, vel, length, channel, track)
   local v8 = (note - 60)/12
   local v_vel = (vel/127) * 5
-  if params:get("w/style") == WSYN_SUSTAIN then
+  if params:get("w/style") == WSYN_SUSTAIN_MONO then
     crow.ii.wsyn.play_voice(track, v8, v_vel)
+    local index = self.channel_map[track] + 1
+    self.channel_map[track] = index
     clock.run(function() 
       clock.sleep(clock.get_beat_sec() * length)
-      crow.ii.wsyn.velocity(track, 0)
+      if self.channel_map[track] == index then
+        crow.ii.wsyn.velocity(track, 0)
+      end
+    end)
+  elseif params:get("w/style") == WSYN_SUSTAIN_STEAL then
+    local slot = self.allocator:get()
+    local index = self.channel_map[slot.id] + 1
+    self.channel_map[slot.id] = index
+    crow.ii.wsyn.play_voice(slot.id, v8, v_vel)
+    slot.on_release = function(slot)
+      if self.channel_map[slot.id] == index then
+        crow.ii.wsyn.velocity(slot.id, 0)
+      end
+    end
+    clock.run(function() 
+      clock.sleep(clock.get_beat_sec() * length)
+      self.allocator:release(slot)
     end)
   else
     crow.ii.wsyn.play_note(v8, v_vel)
@@ -166,7 +196,7 @@ end
 
 notes.play = {
   play_midi_note,
-  play_wsyn_note,
+  function (...) wsyn_player:play_note(...) end,
 }
 
 function midi_note_off(note, vel, length, channel)
