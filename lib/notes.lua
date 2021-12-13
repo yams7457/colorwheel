@@ -1,10 +1,12 @@
 Voice = require("lib/voice")
 
-VOICES = {"midi", "w/syn", "just friends"}
+VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4"}
 
 MIDI_VOICE = 1
 WSYN_VOICE = 2
 JF_VOICE = 3
+CROW_12_VOICE = 4
+CROW_34_VOICE = 5
 
 notes = {}
 
@@ -39,7 +41,7 @@ WSYN_PLUCK = 3
 JF_SUSTAIN_MONO = 1
 JF_SUSTAIN_STEAL = 2
 
-
+ASL_SHAPES = {'linear','sine','logarithmic','exponential','now'}
 
 function notes.init()
   local V5_default0 = controlspec.def{
@@ -153,6 +155,17 @@ function notes.init()
   
   params:add_group("just friends", 1)
   params:add_option("jf/style", "style", {"voice/track", "dynamic poly"}, 1)
+  
+  params:add_group("crow output", 9)
+  params:add_control("crow/attack_time", "attack", controlspec.new(0.0001, 3, 'exp', 0, 0.1, "s"))
+  params:add_option("crow/attack_shape", "attack shape", ASL_SHAPES, 3)
+  params:add_control("crow/decay_time", "decay", controlspec.new(0.0001, 10, 'exp', 0, 1.0, "s"))
+  params:add_option("crow/decay_shape", "decay shape", ASL_SHAPES, 4)
+  params:add_control("crow/sustain", "sustain", controlspec.new(0.0, 1.0, 'lin', 0, 0.75, ""))
+  params:add_control("crow/release_time", "release", controlspec.new(0.0001, 10, 'exp', 0, 0.5, "s"))
+  params:add_option("crow/release_shape", "release shape", ASL_SHAPES, 4)
+  params:add_control("crow/portomento", "portomento", controlspec.new(0.0, 1, 'lin', 0, 0.0, "s"))
+  params:add_binary("crow/legato", "legato", "toggle", 1)
 
 end
 
@@ -239,10 +252,66 @@ function jf_player:play_note(note, vel, length, channel, track)
   end
 end
 
+crow_player = {
+  channel_map={0, 0},
+}
+
+function crow_player:play_note(note, vel, length, channel, track)
+  local v8 = (note - 60)/12
+  local v_vel = (vel/127) * 10
+  local pitch_o = 0;
+  local envelope_o = 0;
+  local voice = 0;
+  local attack = params:get("crow/attack_time")
+  local attack_shape = ASL_SHAPES[params:get("crow/attack_shape")]
+  local decay = params:get("crow/decay_time")
+  local decay_shape = ASL_SHAPES[params:get("crow/decay_shape")]
+  local sustain = params:get("crow/sustain")
+  local release = params:get("crow/release_time")
+  local release_shape = ASL_SHAPES[params:get("crow/release_shape")]
+  local portomento = params:get("crow/portomento")
+  local legato = params:get("crow/legato")
+
+  if params:get("output "..track) == CROW_12_VOICE then
+    voice = 1
+    pitch_o = 1
+    envelope_o = 2
+  else
+    voice = 2
+    pitch_o = 3
+    envelope_o = 4
+  end
+  local was = self.channel_map[voice]
+  local now = was + 1
+  self.channel_map[voice] = now
+  if was then
+    crow.output[pitch_o].action = string.format("{ to(%f,%f,sine) }", v8, portomento)
+    crow.output[pitch_o]()
+  else
+    crow.output[pitch_o].volts = v8
+  end
+  if (was > 0) and (legato > 0) then
+    crow.output[envelope_o].action = string.format("{ to(%f,%f,%s) }", v_vel*sustain, decay, decay_shape)
+  else
+    crow.output[envelope_o].action = string.format("{ to(%f,%f,%s), to(%f,%f,%s) }", v_vel, attack, attack_shape, v_vel*sustain, decay, decay_shape)
+  end
+  crow.output[envelope_o]()
+  clock.run(function() 
+    clock.sleep(clock.get_beat_sec() * length)
+    if self.channel_map[voice] == now then
+      self.channel_map[voice] = 0
+      crow.output[envelope_o].action = string.format("{ to(%f,%f,%s) }", 0, release, release_shape)
+      crow.output[envelope_o]()
+    end
+  end)
+end
+
 notes.play = {
   play_midi_note,
   function (...) wsyn_player:play_note(...) end,
   function (...) jf_player:play_note(...) end,
+  function (...) crow_player:play_note(...) end,
+  function (...) crow_player:play_note(...) end,
 }
 
 function midi_note_off(note, vel, length, channel)
