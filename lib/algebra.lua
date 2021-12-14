@@ -1,7 +1,5 @@
 music_util = require("musicutil")
 
-m = midi.connect()
-
 -- store params until ready to add to group
 local param_queue = {}
 function queue_add_param(param)
@@ -43,6 +41,7 @@ end
 
 for i = 1,4,1
   do
+    queue_add_param{ type = "option", id = "output "..i, name = "output", options= VOICES, default=MIDI_VOICE}
 queue_add_param{ type = "number", id = "gate div " ..i, name = "gate div " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "interval div " ..i, name = "interval div " ..i, min = 1, max = 16, default = 1}
 queue_add_param{ type = "number", id = "octave div " ..i, name = "gate div " ..i, min = 1, max = 16, default = 1}
@@ -72,7 +71,16 @@ queue_add_param{ type = "number", id = "current velocity step " ..i, name = "cur
 queue_add_param{ type = "number", id = "current length step " ..i, name = "current length step " ..i, min = 1, max = 16, default = 1}
 
   dequeue_param_group("track " ..i)
-
+  params:set_action("output "..i, function(param)
+    if param == JF_VOICE then
+      crow.ii.jf.mode(1)
+    end
+    if not currently_banging then
+      currently_banging = true
+      params:bang()
+      currently_banging = false
+    end
+  end)
 end
 
 for i = 1,4,1 do
@@ -495,24 +503,9 @@ end
 
 function play(note, vel, length, channel, track)
   if math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 then
-  if math.random(1,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
-  m:note_on(note, vel, channel)
-  end end
-  clock.run(note_off, note, vel, length, channel, track)
-  print(velocity, current_velocity_1, previous_velocity_1, current_velocity_2, previous_velocity_2)
-end
-
-function note_off(note, vel, length, channel)
-      clock.sleep(clock.get_beat_sec() * length)
-       m:note_off(note, vel, channel)
-end
-
-function m:all_off()
-  for note = 1, 127 do
-    for channel = 1, 16 do
-      for device = 1, 4 do
-        m:note_off(note, 0, channel)
-      end
-    end
+    if math.random(1,100) <= params:get('gate probability 1 ' ..params:get("current gate step 1" )) then
+      notes.play[params:get('output '..track)](note, vel, length, channel, track)
+    end 
   end
+  print(velocity, current_velocity_1, previous_velocity_1, current_velocity_2, previous_velocity_2)
 end

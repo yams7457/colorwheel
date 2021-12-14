@@ -10,6 +10,7 @@
 include 'lib/core'
 include 'lib/norns'
 include 'lib/grid'
+include 'lib/notes'
 include 'lib/algebra'
 lattice = require("lib/lattice")
 
@@ -1979,6 +1980,7 @@ seqorlive:connect { g = grid.connect() }
 function init()
     screen.clear()
     algebra.init()
+    notes.init()
     my_lattice = lattice:new()
     ppqn = 16
   gate_transport_1 = my_lattice:new_pattern{
