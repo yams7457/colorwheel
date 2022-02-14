@@ -239,7 +239,7 @@ end
 
 function play(note, vel, length, channel, track, flourish)
   if flourish or (math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 ) then
-    m:note_on(note, vel, channel)
+    notes.play[params:get("output "..track)](note, vel, length, channel, track)
     print(note, vel, channel)
     end
     clock.run(note_off, note, vel, length, channel, track)

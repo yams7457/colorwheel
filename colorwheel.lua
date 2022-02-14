@@ -21,7 +21,7 @@ function init()
     previous_offset[i] = params:get('offset ' ..i)
   end
   range = {}
-    for trait = 1,5 do
+    for trait = 1,7 do
       range[trait] = {}
         for track = 1,4 do
           range[trait][track] = {1, 6, held = 0}
@@ -584,7 +584,10 @@ function set_up_the_interval_page(track)
   build_the_interval_display_table(track)
   if not momentary_prob then -- if no mod keys are pressed
     for x = 1,16,1 do
-      g:led(x, 6 - display_interval[track][x], 15)
+      g:led(x, 6 - display_interval[track][x], 2)
+    end
+    for x = params:get('interval sequence start ' ..track), params:get('interval sequence end ' ..track),1 do
+      g:led(x, 6-display_interval[track][x], 15)
     end
     end
     for x = params:get('interval sequence start ' ..track), params:get('interval sequence end ' ..track) do
@@ -631,7 +634,10 @@ function set_up_the_octave_page(track)
     end
     g:led(params:get('track octave ' ..track), 1, 12)
     for x = 1,16 do
-      g:led(x, 6 - params:get('octave ' ..track.. ' ' ..x), 15)
+      g:led(x, 6 - params:get('octave ' ..track.. ' ' ..x), 2)
+    end
+    for x = params:get('octave sequence start ' ..track), params:get('octave sequence end ' ..track),1 do
+      g:led(x, 6-params:get('octave ' ..track.. ' ' ..x), 15)
     end
     end
     for x = params:get('octave sequence start ' ..track), params:get('octave sequence end ' ..track) do
@@ -649,7 +655,10 @@ if not momentary_prob then -- if no mod keys are pressed
     local k = {}
     for x = 1,16,1 do
       k[x] = params:get('velocity ' ..track.. ' ' ..x)
-      g:led(x, 6 - k[x], 15)
+      g:led(x, 6 - k[x], 2)
+    end
+    for x = params:get('velocity sequence start ' ..track), params:get('velocity sequence end ' ..track),1 do
+      g:led(x, 6-k[x], 15)
     end
     end
     for x = params:get('velocity sequence start ' ..track), params:get('velocity sequence end ' ..track) do
@@ -667,6 +676,9 @@ function set_up_the_length_page(track)
    local k = {}
     for x = 1,16,1 do
       k[x] = params:get('length ' ..track.. ' ' ..x)
+      g:led(x, 6 - k[x], 2)
+    end
+    for x = params:get('length sequence start ' ..track), params:get('length sequence end ' ..track),1 do
       g:led(x, 6-k[x], 15)
     end
     end
@@ -688,7 +700,7 @@ function set_up_the_alt_note_page(track)
     for x = params:get('alt note sequence start ' ..track), params:get('alt note sequence end ' ..track) do
       g:led(x, 6, 4)
     end
-      if params:get('current alt note step ' ..track) - 1 == 0 then
+      if params:get('current alt note step ' ..track) == params:get('alt note sequence start ' ..track) then
         g:led(params:get('alt note sequence end ' ..track), 6, 12)
       else
         g:led(params:get('current alt note step ' ..track) - 1, 6, 12)
