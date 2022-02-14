@@ -271,16 +271,12 @@ function grid_redraw()
 end
 
 function randomize()
-  params:set('transpose', math.random(0,11))
   core_transposition = math.random(-1,1)
   for i = 1,4,1 do
     for key,value in pairs(note_traits.current) do
-      params:set(key.. " sequence end " ..i, math.random(2,5) * math.random(1,3))
-      params:set(key.. " div " ..i, math.random(1,4) * math.random(1,2) * math.random(1,2))
+      params:set(key.. " sequence end " ..i, math.random(1,16))
     end
     params:set("gate sequence end " ..i, math.random(2,6))
-    params:set("transposition " ..i, core_transposition + math.random(-1,1))
-    params:set("gate div " ..i, math.random(1,3))
 
   for j = 1,16,1 do
       params:set("gate " ..i .." "..j, math.random(0,1))
@@ -528,7 +524,7 @@ function set_up_the_live_page(x,y,z)
   
   for x = 9,14 do
     for y = 7,8 do
-      g:led(x,y,6)
+      g:led(x,y,2)
     end
   end
   
@@ -592,14 +588,14 @@ function set_up_the_interval_page(track)
     end
     end
     for x = params:get('interval sequence start ' ..track), params:get('interval sequence end ' ..track) do
-      g:led(x, 6, 8)
+      g:led(x, 6, 4)
     end
         if params:get('current interval step ' ..track) == params:get('interval sequence start ' ..track) then
       g:led(params:get('interval sequence end ' ..track), 6, 15)
     else
     g:led(params:get('current interval step ' ..track) - 1, 6, 15)
     end
-    g:led(params:get('interval div ' ..track), 7, 8)
+    g:led(params:get('interval div ' ..track), 7, 4)
 end
 
 
@@ -639,13 +635,13 @@ function set_up_the_octave_page(track)
     end
     end
     for x = params:get('octave sequence start ' ..track), params:get('octave sequence end ' ..track) do
-      g:led(x, 6, 8)
+      g:led(x, 6, 4)
     end
         if params:get('current octave step ' ..track) == params:get('octave sequence start ' ..track) then
       g:led(params:get('octave sequence end ' ..track), 6, 15)
     else
     g:led(params:get('current octave step ' ..track) - 1, 6, 15)
-    end    g:led(params:get('octave div ' ..track), 7, 8)
+    end    g:led(params:get('octave div ' ..track), 7, 4)
 end
 
 function set_up_the_velocity_page(track)
@@ -657,13 +653,13 @@ if not momentary_prob then -- if no mod keys are pressed
     end
     end
     for x = params:get('velocity sequence start ' ..track), params:get('velocity sequence end ' ..track) do
-      g:led(x, 6, 8)
+      g:led(x, 6, 4)
     end
         if params:get('current velocity step ' ..track) == params:get('velocity sequence start ' ..track) then
       g:led(params:get('velocity sequence end ' ..track), 6, 15)
     else
     g:led(params:get('current velocity step ' ..track) - 1, 6, 15)
-    end    g:led(params:get('velocity div ' ..track), 7, 8)
+    end    g:led(params:get('velocity div ' ..track), 7, 4)
 end
 
 function set_up_the_length_page(track)
@@ -675,13 +671,13 @@ function set_up_the_length_page(track)
     end
     end
     for x = params:get('length sequence start ' ..track), params:get('length sequence end ' ..track) do
-      g:led(x, 6, 8)
+      g:led(x, 6, 4)
     end
         if params:get('current length step ' ..track) == params:get('length sequence start ' ..track) then
       g:led(params:get('length sequence end ' ..track), 6, 15)
     else
     g:led(params:get('current length step ' ..track) - 1, 6, 15)
-    end    g:led(params:get('length div ' ..track), 7, 8)
+    end    g:led(params:get('length div ' ..track), 7, 4)
 end
 
 function set_up_the_alt_note_page(track)
@@ -690,14 +686,14 @@ function set_up_the_alt_note_page(track)
         g:led(x, 5 - params:get('alt note ' ..track.. ' ' ..x), 15)
       end
     for x = params:get('alt note sequence start ' ..track), params:get('alt note sequence end ' ..track) do
-      g:led(x, 6, 8)
+      g:led(x, 6, 4)
     end
       if params:get('current alt note step ' ..track) - 1 == 0 then
         g:led(params:get('alt note sequence end ' ..track), 6, 12)
       else
         g:led(params:get('current alt note step ' ..track) - 1, 6, 12)
       end
-    g:led(params:get('alt note div ' ..track), 7, 8)
+    g:led(params:get('alt note div ' ..track), 7, 4)
     end
 end
   
