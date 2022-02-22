@@ -10,10 +10,12 @@
 include 'lib/notes'
 include 'lib/algebra'
 lattice = require("lattice")
+include 'lib/pset_sequencer'
 
 g = grid.connect()
 
 function init()
+  pset_seq.init()
   notes.init()
   grid_dirty = true
   clock.run(grid_redraw_clock)
@@ -271,12 +273,10 @@ function grid_redraw()
 end
 
 function randomize()
-  core_transposition = math.random(-1,1)
   for i = 1,4,1 do
     for key,value in pairs(note_traits.current) do
       params:set(key.. " sequence end " ..i, math.random(1,16))
     end
-    params:set("gate sequence end " ..i, math.random(2,6))
 
   for j = 1,16,1 do
       params:set("gate " ..i .." "..j, math.random(0,1))

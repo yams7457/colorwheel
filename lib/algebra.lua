@@ -112,7 +112,7 @@ for i = 1,4,1 do
       queue_add_param{ type = "number", id = "gate " ..i .." "..j, name = "gate " ..i .." "..j, min = 0, max = 1, default = 0 }
       queue_add_param{ type = "number", id = "interval " ..i .." "..j, name = "interval " ..i .." "..j, min = 1, max = 5, default = 1 }
       queue_add_param{ type = "number", id = "octave " ..i .." "..j, name = "octave " ..i .." "..j, min = 1, max = 4, default = 1 }
-      queue_add_param{ type = "number", id = "velocity " ..i .." "..j, name = "velocity " ..i .." "..j, min = 0, max = 127, default = 127 }
+      queue_add_param{ type = "option", id = "velocity " ..i .." "..j, name = "velocity " ..i .." "..j, options = {"0", "32", "64", "96", "127"}, default = 5}
       queue_add_param{ type = "option", id = "length " .. i .. " " ..j, name = "length " .. i .. " " ..j, options = {"1/4", "1/2", "1", "2", "4"}, default = 1}
       queue_add_param{ type = "number", id = "alt note " ..i .." "..j, name = "alt note " ..i .." "..j, min = 0, max = 4, default = 0 }
       queue_add_param{ type = "number", id = "ratchet "  ..i .." "..j, name = "ratchet " ..i .." "..j, min = 0, max = 5, default = 0 }
