@@ -268,6 +268,12 @@ function grid_redraw()
   
   end -- live page should be above this
   
+  if navigation_bar.sequence_or_live == 2 then
+    
+    set_up_the_meta_sequencer_page()
+  
+  end
+  
   g:refresh()
 
 end
@@ -305,7 +311,7 @@ end
 
 function g.key(x,y,z)
   
-  if x == 16 and y == 8 and z == 1 then -- toggle sequence and live
+  if x == 16 and y == 8 and z == 1 then -- toggle between sequence, live, and 'meta-sequence'
     sequence_or_live_toggle()
   end
   
@@ -473,7 +479,23 @@ end -- all seq stuff should be above this line
     end
   end
       
+  if navigation_bar.sequence_or_live == 2 then
     
+    if x >= 12 and y <= 6 then
+      params:set('load_pset', (y - 1) * 4 + x - 12)
+      print(params:get('load_pset'))
+    end
+    
+    if y == 7 then
+      params:set('pset_seq_beats', x)
+    end
+    
+    if y == 8 and x <= 4 then
+      params:set('pset_seq_beats_per_bar', x)
+    end
+      
+    
+  end
       
 
     grid_dirty = true
@@ -506,10 +528,8 @@ function set_up_the_nav_bar()
 end
 
 function sequence_or_live_toggle()
-  if navigation_bar.sequence_or_live == 0 then
-    navigation_bar.sequence_or_live = 1
-  else navigation_bar.sequence_or_live = 0
-  end
+  navigation_bar.sequence_or_live = (navigation_bar.sequence_or_live + 1) % 3
+  print(navigation_bar.sequence_or_live)
 end
 
 function set_up_the_live_page(x,y,z)
@@ -578,6 +598,27 @@ if not momentary_time and not momentary_prob then -- if no mod keys are pressed
     end
   end
 end
+end
+
+function set_up_the_meta_sequencer_page()
+  g:all(0)
+  g:led(16, 8, 5)
+  for i = 1, 16 do
+    g:led(i, 7, 2)
+  end
+  g:led(params:get('pset_seq_beats'), 7, 15)
+  for i = 1,4 do
+    g:led(i, 8, 2)
+  end
+  g:led(params:get('pset_seq_beats_per_bar'), 8, 15)
+  for i = 13, 16 do
+    for j = 1, 6 do
+      g:led(i, j, 4)
+    end
+  end
+  if params:get('load_pset') <= 24 then
+    g:led((params:get('load_pset') - 1) % 4 + 13, math.floor((params:get('load_pset') - 1) / 4 + 1), 15)
+  end
 end
 
 function set_up_the_interval_page(track)
