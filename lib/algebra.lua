@@ -152,19 +152,21 @@ end
 
 step = 0
 
-collection_0 =
-  {{0,7,12,19,24,31,36,0,2,7,12,14,19,24,0,2,7,9,12,14,19,0,2,4,7,9,12,14},
-  {2,7,14,19,26,31,38,2,7,9,14,19,21,26,2,4,7,9,14,16,19,2,4,7,9,11,14,16},
-  {2,9,14,21,26,33,38,2,4,9,14,16,21,26,2,4,9,11,14,16,21,2,4,6,9,11,14,16},
-  {4,9,16,21,28,33,40,4,9,11,16,21,23,28,4,6,9,11,16,18,21,1,4,6,9,11,13,16},
-  {4,11,16,23,28,35,40,4,6,11,16,18,23,28,1,4,6,11,13,16,18,1,4,6,8,11,13,16},
-  {6,11,18,23,30,35,42,1,6,11,13,18,23,25,1,6,8,11,13,18,20,1,3,6,8,1,13,15},
-  {0,5,12,17,24,29,36,0,5,7,12,17,19,24,0,2,5,7,12,14,17,0,2,5,7,9,12,14},
-  {5,10,17,22,29,34,41,0,5,10,12,17,22,24,0,5,7,10,12,17,19,0,2,5,7,10,12,14},
-  {3,10,15,22,27,34,39,3,5,10,15,17,22,27,0,3,5,10,12,15,17,0,3,5,7,10,12,15},
-  {3,8,15,20,27,32,39,3,8,10,15,20,22,27,3,5,8,10,15,17,20,0,3,5,8,10,12,15},
-  {1,8,13,20,25,32,37,1,3,8,13,15,20,25,1,3,8,10,13,15,20,1,3,5,8,10,13,15},
-  {1,6,13,18,25,30,37,1,6,8,13,18,20,25,1,3,6,8,13,15,18,1,3,6,8,10,13,15}}
+root = 0
+fifth = 7
+second = 2
+sixth = 9
+third = 4
+
+function create_the_collection()
+
+collection_0 = {}
+
+for i = 0,11 do
+  collection_0[i] = {root + i, fifth + i, root + i, fifth + i, root + i, fifth + i, root + i, root + i, second + i, fifth + i, root + i, second + i, fifth + i, root + i, root + i, second + i, fifth + i, sixth + i, root + i, second + i, fifth + i, root + i, second + i, third + i, fifth + i, sixth + i, root + i, second + i}
+end
+
+end
 
 offset_list = {{0,5,12,17,24},{0,7,12,19,24}}
 
@@ -250,7 +252,7 @@ end
 function play(note, vel, length, channel, track, flourish)
   if flourish or (math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 ) then
     notes.play[params:get("output "..track)](note, vel, length, channel, track)
-    print(note, vel, channel)
+    --print(note, vel, channel)
     end
     clock.run(note_off, note, vel, length, channel, track)
   end

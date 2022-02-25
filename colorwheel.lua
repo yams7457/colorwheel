@@ -17,6 +17,7 @@ g = grid.connect()
 function init()
   pset_seq.init()
   notes.init()
+  create_the_collection()
   grid_dirty = true
   clock.run(grid_redraw_clock)
   for i = 1,4 do
@@ -199,6 +200,7 @@ end
 
 function return_to_root()
     params:set('key', 0)
+    params:set('transpose', 0)
     print("Live transposition nullified!")
 end
 
@@ -481,7 +483,7 @@ end -- all seq stuff should be above this line
       
   if navigation_bar.sequence_or_live == 2 then
     
-    if x >= 12 and y <= 6 then
+    if x >= 13 and y <= 6 then
       params:set('load_pset', (y - 1) * 4 + x - 12)
       print(params:get('load_pset'))
     end
@@ -494,6 +496,30 @@ end -- all seq stuff should be above this line
       params:set('pset_seq_beats_per_bar', x)
     end
       
+    if y == 2 then
+      third = x - 1
+      create_the_collection()
+    end
+    
+    if y == 3 then
+      sixth = x - 1
+      create_the_collection()
+    end
+    
+    if y == 4 then
+      second = x - 1
+      create_the_collection()
+    end
+    
+    if y == 5 then
+      fifth = x - 1
+      create_the_collection()
+    end
+    
+    if y == 6 then
+      root = x - 1
+      create_the_collection()
+    end
     
   end
       
@@ -604,11 +630,11 @@ function set_up_the_meta_sequencer_page()
   g:all(0)
   g:led(16, 8, 5)
   for i = 1, 16 do
-    g:led(i, 7, 2)
+    g:led(i, 7, 4)
   end
   g:led(params:get('pset_seq_beats'), 7, 15)
   for i = 1,4 do
-    g:led(i, 8, 2)
+    g:led(i, 8, 4)
   end
   g:led(params:get('pset_seq_beats_per_bar'), 8, 15)
   for i = 13, 16 do
@@ -619,6 +645,30 @@ function set_up_the_meta_sequencer_page()
   if params:get('load_pset') <= 24 then
     g:led((params:get('load_pset') - 1) % 4 + 13, math.floor((params:get('load_pset') - 1) / 4 + 1), 15)
   end
+  g:led(root + 1, 6, 15)
+  g:led(fifth + 1, 5, 15)
+  g:led(second + 1, 4, 15)
+  g:led(sixth + 1, 3, 15)
+  g:led(third + 1, 2, 15)
+  for x = 1, 12 do
+    if x <= root then
+      g:led(x, 6, 2)
+    end
+    if x <= fifth then
+      g:led(x, 5, 2)
+    end
+    if x <= second then
+      g:led(x, 4, 2)
+    end
+    if x <= sixth then
+      g:led(x, 3, 2)
+    end
+    if x <= third then
+      g:led(x, 2, 2)
+    end
+  
+  end
+  
 end
 
 function set_up_the_interval_page(track)
