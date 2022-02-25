@@ -1,12 +1,13 @@
 Voice = require("lib/voice")
 
-VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4"}
+VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4", "ansible"}
 
 MIDI_VOICE = 1
 WSYN_VOICE = 2
 JF_VOICE = 3
 CROW_12_VOICE = 4
 CROW_34_VOICE = 5
+ANSIBLE_VOICE = 6
 
 notes = {}
 
@@ -166,6 +167,14 @@ function notes.init()
   params:add_option("crow/release_shape", "release shape", ASL_SHAPES, 4)
   params:add_control("crow/portomento", "portomento", controlspec.new(0.0, 1, 'lin', 0, 0.0, "s"))
   params:add_binary("crow/legato", "legato", "toggle", 1)
+  
+  params:add_group("ansible", 1)
+  params:add_number("ansible/offset_halfsteps", "offset halfsteps", 0, 48, 12)
+  params:set_action("ansible/offset_halfsteps", ifoutput(ANSIBLE_VOICE, function(param)
+    for i=1,4,1 do
+      crow.ii.ansible.cv_offset(i, param/12)
+    end
+  end))
 
 end
 
@@ -304,6 +313,16 @@ function crow_player:play_note(note, vel, length, channel, track)
       crow.output[envelope_o]()
     end
   end)
+end
+
+ansible_player = {}
+
+function ansible_player:play_note(note, vel, length, channel, track)
+  local v8 = (note - 60)/12
+  crow.ii.ansible.cv(track, v8)
+  crow.ii.ansible.trigger_time(track, clock.get_beat_sec() * length)
+  crow.ii.ansible.trigger_pulse(track)
+  
 end
 
 notes.play = {
