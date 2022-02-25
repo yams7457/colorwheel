@@ -327,25 +327,16 @@ function ansible_player:play_note(note, vel, length, channel, track)
 end
 
 disting_player = {
-  channel_map={0, 0, 0, 0, 0, 0},
-  allocator=Voice.new(6, Voice.LRU),
 }
 
 function disting_player:play_note(note, vel, length, channel, track)
-  local v_vel = (vel/127) * 5
-  local slot = self.allocator:get()
-  local index = self.channel_map[slot.id] + 1
-  self.channel_map[slot.id] = index
-  crow.ii.disting.voice_pitch(slot.id, note)
-  crow.ii.disting.voice_on(slot.id, v_vel)
-  slot.on_release = function(slot)
-    if self.channel_map[slot.id] == index then
-      crow.ii.disting.voice_off(slot.id)
-    end
-  end
+  local v_vel = (vel/127) * 10
+  local v8 = (note - 36)/12
+  crow.ii.disting.note_pitch(note, v8)
+  crow.ii.disting.note_velocity(note, v_vel)
   clock.run(function() 
     clock.sleep(clock.get_beat_sec() * length)
-    self.allocator:release(slot)
+    crow.ii.disting.note_off(note)    
   end)
 end
 
