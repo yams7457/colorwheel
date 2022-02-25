@@ -1,6 +1,6 @@
 Voice = require("lib/voice")
 
-VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4", "ansible"}
+VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4", "ansible", "disting"}
 
 MIDI_VOICE = 1
 WSYN_VOICE = 2
@@ -8,6 +8,7 @@ JF_VOICE = 3
 CROW_12_VOICE = 4
 CROW_34_VOICE = 5
 ANSIBLE_VOICE = 6
+DISTING_VOICE = 7
 
 notes = {}
 
@@ -325,12 +326,37 @@ function ansible_player:play_note(note, vel, length, channel, track)
   
 end
 
+disting_player = {
+  channel_map={0, 0, 0, 0, 0, 0},
+  allocator=Voice.new(6, Voice.LRU),
+}
+
+function disting_player:play_note(note, vel, length, channel, track)
+  local v_vel = (vel/127) * 5
+  local slot = self.allocator:get()
+  local index = self.channel_map[slot.id] + 1
+  self.channel_map[slot.id] = index
+  crow.ii.disting.voice_pitch(slot.id, note)
+  crow.ii.disting.voice_on(slot.id, v_vel)
+  slot.on_release = function(slot)
+    if self.channel_map[slot.id] == index then
+      crow.ii.disting.voice_off(slot.id)
+    end
+  end
+  clock.run(function() 
+    clock.sleep(clock.get_beat_sec() * length)
+    self.allocator:release(slot)
+  end)
+end
+
 notes.play = {
   play_midi_note,
   function (...) wsyn_player:play_note(...) end,
   function (...) jf_player:play_note(...) end,
   function (...) crow_player:play_note(...) end,
   function (...) crow_player:play_note(...) end,
+  function (...) ansible_player:play_note(...) end,
+  function (...) disting_player:play_note(...) end,
 }
 
 function midi_note_off(note, vel, length, channel)
