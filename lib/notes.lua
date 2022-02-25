@@ -1,12 +1,14 @@
 Voice = require("lib/voice")
 
-VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4"}
+VOICES = {"midi", "w/syn", "just friends", "crow 1,2", "crow 3,4", "ansible", "disting"}
 
 MIDI_VOICE = 1
 WSYN_VOICE = 2
 JF_VOICE = 3
 CROW_12_VOICE = 4
 CROW_34_VOICE = 5
+ANSIBLE_VOICE = 6
+DISTING_VOICE = 7
 
 notes = {}
 
@@ -166,6 +168,14 @@ function notes.init()
   params:add_option("crow/release_shape", "release shape", ASL_SHAPES, 4)
   params:add_control("crow/portomento", "portomento", controlspec.new(0.0, 1, 'lin', 0, 0.0, "s"))
   params:add_binary("crow/legato", "legato", "toggle", 1)
+  
+  params:add_group("ansible", 1)
+  params:add_number("ansible/offset_halfsteps", "offset halfsteps", 0, 48, 12)
+  params:set_action("ansible/offset_halfsteps", ifoutput(ANSIBLE_VOICE, function(param)
+    for i=1,4,1 do
+      crow.ii.ansible.cv_offset(i, param/12)
+    end
+  end))
 
 end
 
@@ -306,12 +316,47 @@ function crow_player:play_note(note, vel, length, channel, track)
   end)
 end
 
+ansible_player = {}
+
+function ansible_player:play_note(note, vel, length, channel, track)
+  local v8 = (note - 60)/12
+  crow.ii.ansible.cv(track, v8)
+  crow.ii.ansible.trigger_time(track, clock.get_beat_sec() * length)
+  crow.ii.ansible.trigger_pulse(track)
+  
+end
+
+disting_player = {
+  channel_map={0, 0, 0, 0, 0, 0},
+  allocator=Voice.new(6, Voice.LRU),
+}
+
+function disting_player:play_note(note, vel, length, channel, track)
+  local v_vel = (vel/127) * 5
+  local slot = self.allocator:get()
+  local index = self.channel_map[slot.id] + 1
+  self.channel_map[slot.id] = index
+  crow.ii.disting.voice_pitch(slot.id, note)
+  crow.ii.disting.voice_on(slot.id, v_vel)
+  slot.on_release = function(slot)
+    if self.channel_map[slot.id] == index then
+      crow.ii.disting.voice_off(slot.id)
+    end
+  end
+  clock.run(function() 
+    clock.sleep(clock.get_beat_sec() * length)
+    self.allocator:release(slot)
+  end)
+end
+
 notes.play = {
   play_midi_note,
   function (...) wsyn_player:play_note(...) end,
   function (...) jf_player:play_note(...) end,
   function (...) crow_player:play_note(...) end,
   function (...) crow_player:play_note(...) end,
+  function (...) ansible_player:play_note(...) end,
+  function (...) disting_player:play_note(...) end,
 }
 
 function midi_note_off(note, vel, length, channel)

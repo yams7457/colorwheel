@@ -105,6 +105,8 @@ for i = 1,4,1 do
 
 end
 
+finish_output_setting = {nil, nil, nil, nil}
+
 for i = 1,4,1 do
 
     for j = 1,16,1 do
@@ -121,16 +123,24 @@ for i = 1,4,1 do
           queue_add_param{ type = "number", id = key.. " probability " .. i .." " ..j, name = key .. " probability " .. i .. " " ..j, min = 0, max = 100, default = 100 }
       end
       
-         params:set_action("output "..i, function(param)
-     if param == JF_VOICE then
-       crow.ii.jf.mode(1)
-     end
-     if not currently_banging then
-       currently_banging = true
-       params:bang()
-       currently_banging = false
-     end
-   end)
+      params:set_action("output "..i, function(param)
+        if finish_output_setting[i] ~= nil then
+          clock.cancel(finish_output_setting[i])
+          finish_output_setting[i] = nil
+        end
+        currently_banging = true
+        finish_output_setting[i] = clock.run(function ()
+          clock.sleep(0.5)
+          if param == JF_VOICE then
+            crow.ii.jf.mode(1)
+          end
+          if not currently_banging then
+            params:bang()
+            currently_banging = false
+          end
+          finish_output_setting[i] = nil
+        end)
+      end)
       
       
     end
