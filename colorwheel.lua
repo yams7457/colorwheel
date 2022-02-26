@@ -468,7 +468,7 @@ end -- all seq stuff should be above this line
       params:set('offset mode', params:get('offset mode') % 2 + 1)
     end
     
-    if y >= 7 and x <= 14 and x >= 9 and z == 1then
+    if y >= 7 and x <= 14 and x >= 9 and z == 1 then
       params:set('transpose', inverted_transpose[x][y])
     end
     
