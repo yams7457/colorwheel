@@ -12,6 +12,9 @@ include 'lib/algebra'
 lattice = require("lattice")
 include 'lib/pset_sequencer'
 
+write_preset = 0
+change_preset = 0
+
 g = grid.connect()
 
 function init()
@@ -51,7 +54,13 @@ function init()
 
   for x = 1, 4 do
     tracks[x].gate = colorwheel_lattice:new_pattern{
-      action = function() trait_tick("gate", x, tracks[x].gate) end,
+      action = function() trait_tick("gate", x, tracks[x].gate) 
+        if change_preset >= 1 then 
+          params:set('load_pset', change_preset)
+          change_preset = 0
+          create_the_collection()
+        end
+      end,
       division = params:get("gate div " ..x) / 64
     }
     tracks[x].interval = colorwheel_lattice:new_pattern{
@@ -483,42 +492,64 @@ end -- all seq stuff should be above this line
       
   if navigation_bar.sequence_or_live == 2 then
     
-    if x >= 13 and y <= 6 then
-      params:set('load_pset', (y - 1) * 4 + x - 12)
-      print(params:get('load_pset'))
+    if y == 8 and x == 14 and z == 1 then
+      if params:get("pset_seq_enabled") >= 2 then
+        params:set("pset_seq_enabled", 1)
+      else
+        params:set("pset_seq_enabled", 2)
+      end
+      end
+    
+    if y == 8 and x == 10 then
+      write_preset = z
+    end
+    
+    if x >= 13 and y <= 6 and z == 1 then
+      if write_preset == 1 then
+        params:write((y - 1) * 4 + x - 12, ((y - 1) * 4 + x - 12))
+      else
+        if colorwheel_lattice.enabled then
+          change_preset = (y - 1) * 4 + x - 12
+          else params:set('load_pset', (y - 1) * 4 + x - 12)
+          create_the_collection()
+        end
+        print(params:get('load_pset'))
+      end
     end
     
     if y == 7 then
       params:set('pset_seq_beats', x)
     end
-    
+  
     if y == 8 and x <= 4 then
       params:set('pset_seq_beats_per_bar', x)
     end
       
+    if x <= 12 then
     if y == 2 then
-      third = x - 1
+      params:set("third", x - 1)
       create_the_collection()
     end
     
     if y == 3 then
-      sixth = x - 1
+      params:set("sixth", x -1)
       create_the_collection()
     end
     
     if y == 4 then
-      second = x - 1
+      params:set("second", x - 1)
       create_the_collection()
     end
     
     if y == 5 then
-      fifth = x - 1
+      params:set("fifth", x - 1)
       create_the_collection()
     end
     
     if y == 6 then
-      root = x - 1
+      params:set("root", x - 1)
       create_the_collection()
+    end
     end
     
   end
@@ -629,6 +660,12 @@ end
 function set_up_the_meta_sequencer_page()
   g:all(0)
   g:led(16, 8, 5)
+  g:led(10,8,6 + 9 * write_preset)
+  if params:get("pset_seq_enabled") >= 2 then
+    g:led(14, 8, 15)
+  else
+    g:led(14, 8, 6)
+  end
   for i = 1, 16 do
     g:led(i, 7, 4)
   end
@@ -637,33 +674,34 @@ function set_up_the_meta_sequencer_page()
     g:led(i, 8, 4)
   end
   g:led(params:get('pset_seq_beats_per_bar'), 8, 15)
-  for i = 13, 16 do
-    for j = 1, 6 do
-      g:led(i, j, 4)
-    end
+  for i = params:get('pset_exclusion_first'), params:get('pset_exclusion_last') do
+    g:led((i - 1) % 4 + 13, math.floor((i - 1) / 4 + 1), 6)
   end
   if params:get('load_pset') <= 24 then
     g:led((params:get('load_pset') - 1) % 4 + 13, math.floor((params:get('load_pset') - 1) / 4 + 1), 15)
   end
-  g:led(root + 1, 6, 15)
-  g:led(fifth + 1, 5, 15)
-  g:led(second + 1, 4, 15)
-  g:led(sixth + 1, 3, 15)
-  g:led(third + 1, 2, 15)
-  for x = 1, 12 do
-    if x <= root then
+  g:led(params:get("root") + 1, 6, 4)
+  g:led(params:get("fifth") + 1, 5, 4)
+  g:led(params:get("second") + 1, 4, 4)
+  g:led(params:get("sixth") + 1, 3, 4)
+  g:led(params:get("third") + 1, 2, 4)
+  for y = 2,6 do
+    g:led(1, y, 4)
+  end
+  for x = 2, 12 do
+    if x <= params:get("root") then
       g:led(x, 6, 2)
     end
-    if x <= fifth then
+    if x <= params:get("fifth") then
       g:led(x, 5, 2)
     end
-    if x <= second then
+    if x <= params:get("second") then
       g:led(x, 4, 2)
     end
-    if x <= sixth then
+    if x <= params:get("sixth") then
       g:led(x, 3, 2)
     end
-    if x <= third then
+    if x <= params:get("third") then
       g:led(x, 2, 2)
     end
   

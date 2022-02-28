@@ -80,6 +80,7 @@ local function set_pset_seq_timer()
   -- local current_pset = first.min
   pset_seq_timer = metro.init(function() 
     if params:get("pset_seq_enabled") == 2 then
+      create_the_collection()
       local first = params:lookup_param("pset_exclusion_first")
       local last = params:lookup_param("pset_exclusion_last")
       local new_pset_id
@@ -246,7 +247,7 @@ pset_seq.init = function (pset_exclusion_tables, pset_exclusion_table_labels)
   params:add_number("pset_exclusion_first", "first", 1, pset_seq.get_num_psets(), 1)
   params:set_action("pset_exclusion_first", function(val) 
     set_pset_exclusion_first(val)
-    set_pset_exclusion_last()
+    set_pset_exclusion_lfast()
   end )
   
 
@@ -267,7 +268,7 @@ pset_seq.init = function (pset_exclusion_tables, pset_exclusion_table_labels)
   if pset_path == "/flora" then
     default_exclusions = {"pset_seq_enabled","pset_seq_mode","load_pset", "pset_seq_beats","pset_seq_beats_per_bar","plow1_max_level","plow1_max_time","plow2_max_level","plow2_max_time"}
   else
-    default_exclusions = {"pset_seq_enabled","pset_seq_mode","load_pset", "pset_exclusion_first", "pset_exclusion_last", "current gate step 1", "current gate step 2", "current gate step 3", "current gate step 4"}
+    default_exclusions = {"pset_seq_enabled","pset_seq_mode","load_pset", "pset_exclusion_first", "pset_exclusion_last", "current gate step 1", "current gate step 2", "current gate step 3", "current gate step 4", "offset 1", "offset 2", "offset 3", "offset 4", "transposition 1", "transposition 2", "transposition 3", "transposition 4", "carving 1", "carving 2", "carving 3", "carving 4", "probability 1", "probability 2", "probability 3", "probability 4"}
   end
   pset_seq.set_save_paramlist(default_exclusions, false)
 

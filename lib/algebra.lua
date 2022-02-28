@@ -71,6 +71,12 @@ function dequeue_param_group(group_name)
   param_queue = {}
 end
 
+queue_add_param{ type = "number", id = "root", name = "root", min = 0, max = 11, default = 0 }
+queue_add_param{ type = "number", id = "fifth", name = "fifth", min = 0, max = 11, default = 7 }
+queue_add_param{ type = "number", id = "second", name = "second", min = 0, max = 11, default = 2 }
+queue_add_param{ type = "number", id = "sixth", name = "sixth", min = 0, max = 11, default = 9 }
+queue_add_param{ type = "number", id = "third", name = "third", min = 0, max = 11, default = 4 }
+
 queue_add_param{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
 queue_add_param{ type = "number", id = "meta loop start", name = "meta loop start", min = 1, max = 16, default = 1 }
 queue_add_param{ type = "number", id = "meta loop end", name = "meta loop end", min = 1, max = 16, default = 6 }
@@ -152,18 +158,12 @@ end
 
 step = 0
 
-root = 0
-fifth = 7
-second = 2
-sixth = 9
-third = 4
-
 function create_the_collection()
 
 collection_0 = {}
 
 for i = 0,11 do
-  collection_0[i] = {root + i, fifth + i, root + i, fifth + i, root + i, fifth + i, root + i, root + i, second + i, fifth + i, root + i, second + i, fifth + i, root + i, root + i, second + i, fifth + i, sixth + i, root + i, second + i, fifth + i, root + i, second + i, third + i, fifth + i, sixth + i, root + i, second + i}
+  collection_0[i] = {params:get("root") + i, params:get("fifth") + i, params:get("root") + i, params:get("fifth") + i, params:get("root") + i, params:get("fifth") + i, params:get("root") + i, params:get("root") + i, params:get("second") + i, params:get("fifth") + i, params:get("root") + i, params:get("second") + i, params:get("fifth") + i, params:get("root") + i, params:get("root") + i, params:get("second") + i, params:get("fifth") + i, params:get("sixth") + i, params:get("root") + i, params:get("second") + i, params:get("fifth") + i, params:get("root") + i, params:get("second") + i, params:get("third") + i, params:get("fifth") + i, params:get("sixth") + i, params:get("root") + i, params:get("second") + i}
 end
 
 end
@@ -225,7 +225,7 @@ function determine_traits(track, flourish)
   local current_inner_index = {} -- setting up some things for the algebra later
   local current_octave = {}
   local current_offset = {}
-  local outer_index = 1 + params:get("transpose")
+  local outer_index = params:get("transpose")
   local carving = params:get("carving " ..track) * 7
   local inner_index = (carving + interval)
   current_inner_index[track] = inner_index
