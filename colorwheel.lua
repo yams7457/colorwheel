@@ -54,34 +54,34 @@ function init()
 
   for x = 1, 4 do
     tracks[x].gate = colorwheel_lattice:new_pattern{
-      action = function() trait_tick("gate", x, tracks[x].gate) 
+      action = function(t) trait_tick("gate", x, tracks[x].gate, t) 
         if change_preset >= 1 then 
           params:set('load_pset', change_preset)
           change_preset = 0
           create_the_collection()
         end
       end,
-      division = params:get("gate div " ..x) / 64
+      division = params:get("gate div " ..x) / (32 / params:get("global clock div"))
     }
     tracks[x].interval = colorwheel_lattice:new_pattern{
       action = function() trait_tick("interval", x, tracks[x].interval) end,
-      division = params:get("interval div " ..x) / 64
+      division = params:get("interval div " ..x) / (32 / params:get("global clock div"))
     }
    tracks[x].octave = colorwheel_lattice:new_pattern{
       action = function() trait_tick("octave", x, tracks[x].octave) end,
-      division = params:get("octave div " ..x) / 64
+      division = params:get("octave div " ..x) / (32 / params:get("global clock div"))
     }
     tracks[x].velocity = colorwheel_lattice:new_pattern{
       action = function() trait_tick("velocity", x, tracks[x].velocity) end,
-      division = params:get("velocity div " ..x) / 64
+      division = params:get("velocity div " ..x) / (32 / params:get("global clock div"))
     }
     tracks[x].length = colorwheel_lattice:new_pattern{
-      action = function () trait_tick("length", x, tracks[x].length) end,
-      division = params:get("length div " ..x) / 64
+      action = function() trait_tick("length", x, tracks[x].length) end,
+      division = params:get("length div " ..x) / (32 / params:get("global clock div"))
     }
     tracks[x].alt = colorwheel_lattice:new_pattern{
       action = function() trait_tick("alt note", x, tracks[x].alt) end,
-      division = params:get("alt note div " ..x) / 64
+      division = params:get("alt note div " ..x) / (32 / params:get("global clock div"))
     }
 
   end
@@ -196,16 +196,6 @@ inverted_transpose[14][7] = 11
 momentary_loop = false
 momentary_time = false
 momentary_prob = false
-
-function up_a_fifth()
-  params:set('key', (params:get('key') + 7) % 12)
-  grid_dirty = true
-end
-
-function down_a_fifth()
-  params:set('key', (params:get('key') - 7) % 12)
-  grid_dirty = true
-end
 
 function return_to_root()
     params:set('key', 0)
@@ -421,20 +411,6 @@ end -- all seq stuff should be above this line
   
   if navigation_bar.sequence_or_live == 1 then
     if z == 1 then
-    if y == 6 and x == 9 then
-      down_a_fifth()
-      down_a_fifth()
-    end
-    if y == 6 and x == 10 then
-      down_a_fifth()
-    end
-    if y == 6 and x == 11 then
-      up_a_fifth()
-    end
-    if y == 6 and x == 12 then
-      up_a_fifth()
-      up_a_fifth()
-    end
     
     if x == 5 and y == 7 then
       clock_sync()
@@ -473,6 +449,7 @@ end -- all seq stuff should be above this line
       end
     end
     
+    
     if y == 7 and x == 1 and z == 1 then
       params:set('offset mode', params:get('offset mode') % 2 + 1)
     end
@@ -488,6 +465,11 @@ end -- all seq stuff should be above this line
     if y == 7 and x <= 7 and x >= 5 then
       momentary_jumps[x] = z
     end
+    
+    if y == 8 and x <=8 then
+      params:set("global clock div", x)
+    end
+      
   end
       
   if navigation_bar.sequence_or_live == 2 then
@@ -606,8 +588,8 @@ function set_up_the_live_page(x,y,z)
   end
   
   g:led(global_transpose.x[params:get('transpose')], global_transpose.y[params:get('transpose')], 12)
-  g:led(9, 6, 7)
-  g:led(12, 6, 7)
+  g:led(9, 6, 3)
+  g:led(12, 6, 3)
   g:led(10, 6, 3)
   g:led(11, 6, 3)
   
@@ -615,17 +597,17 @@ function set_up_the_live_page(x,y,z)
     g:led (x, 7, 7)
   end
   
-  for x = 9,12 do
-    if momentary_jumps[x] == 1 then
-      g:led(x, 6, 12)
-    end
-  end
-  
   for x = 5,7 do
     if momentary_jumps[x] == 1 then
       g:led(x, 7, 12)
     end
   end
+  
+  for x = 1,8 do
+    g:led(x, 8, 3)
+  end
+  
+  g:led(params:get("global clock div"), 8, 12)
   
   for x = params:get('gate sequence start 1'), params:get('gate sequence end 1') do
     g:led(x, 1, 8)
@@ -710,7 +692,7 @@ function set_up_the_meta_sequencer_page()
 end
 
 function set_up_the_interval_page(track)
-  build_the_interval_display_table(track)
+    build_the_interval_display_table(track)
   if not momentary_prob then -- if no mod keys are pressed
     for x = 1,16,1 do
       g:led(x, 6 - display_interval[track][x], 2)
@@ -860,6 +842,9 @@ function gate_toggle(x,y,z)
       params:set('gate ' ..y.. ' ' ..x, 1)
     end
   end
+  for i = 1, 16 do
+    print(i, params:get('gate 1 ' ..i))
+  end
 end
 
 function change_interval(x,y,z,track)
@@ -929,6 +914,10 @@ end
 
 function change_div(x,y,z,trait,track)
   params:set((trait_dummies[trait].. ' div ' ..track), x)
+end
+
+function change_global_div(x,y,z)
+  params:set("global clock div", x)
 end
 
 function change_the_step_probability(x,y,z,trait,track)

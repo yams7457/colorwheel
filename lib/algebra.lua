@@ -78,6 +78,7 @@ queue_add_param{ type = "number", id = "sixth", name = "sixth", min = 0, max = 1
 queue_add_param{ type = "number", id = "third", name = "third", min = 0, max = 11, default = 4 }
 
 queue_add_param{ type = "number", id = "key", name = "key", min = 0, max = 11, default = 0 }
+queue_add_param{ type = "number", id = "global clock div", name = "global clock div", min = 1, max = 8, default = 4 }
 queue_add_param{ type = "number", id = "meta loop start", name = "meta loop start", min = 1, max = 16, default = 1 }
 queue_add_param{ type = "number", id = "meta loop end", name = "meta loop end", min = 1, max = 16, default = 6 }
 queue_add_param{ type = "number", id = "offset", name = "offset", min = 0, max = 11, default = 0 }
@@ -196,7 +197,7 @@ function m:all_off()
   end
 end
 
-function trait_tick(a_trait, track, source_lattice)
+function trait_tick(a_trait, track, source_lattice, t)
      if a_trait == "gate" 
       and params:get("gate " ..track.. " " ..params:get("current gate step " ..track)) == 1 
           and math.random(1,100) <= params:get("gate probability " .. track .. " " .. params:get("current gate step " ..track))
@@ -205,7 +206,7 @@ function trait_tick(a_trait, track, source_lattice)
             end
     params:set("current " .. a_trait .. " step " .. track, ((params:get("current " .. a_trait .. " step " .. track) - params:get(a_trait .. " sequence start " .. track)) + 1) % (params:get(a_trait .. " sequence end " .. track) - params:get(a_trait .. " sequence start " .. track) + 1) + params:get(a_trait .. " sequence start " .. track))
     grid_dirty = true
-    source_lattice:set_division(params:get(a_trait..  ' div ' ..track) / 8)
+    source_lattice:set_division(params:get(a_trait..  ' div ' ..track) * params:get("global clock div") / 32)
 end
 
 function determine_traits(track, flourish)
@@ -236,7 +237,7 @@ function determine_traits(track, flourish)
   for key,value in pairs(note_traits.current) do
       note_traits.previous[key][track] = note_traits.previous[key][track]
   end
-  play(current_note[track], velocity_values[velocity], length_values[length], current_channel[track], track, flourish)
+  play(current_note[track] + params:get("key"), velocity_values[velocity], length_values[length], current_channel[track], track, flourish)
 end
 
 function check_step_probability(track)

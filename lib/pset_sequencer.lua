@@ -268,7 +268,7 @@ pset_seq.init = function (pset_exclusion_tables, pset_exclusion_table_labels)
   if pset_path == "/flora" then
     default_exclusions = {"pset_seq_enabled","pset_seq_mode","load_pset", "pset_seq_beats","pset_seq_beats_per_bar","plow1_max_level","plow1_max_time","plow2_max_level","plow2_max_time"}
   else
-    default_exclusions = {"pset_seq_enabled","pset_seq_mode","load_pset", "pset_exclusion_first", "pset_exclusion_last", "current gate step 1", "current gate step 2", "current gate step 3", "current gate step 4", "offset 1", "offset 2", "offset 3", "offset 4", "transposition 1", "transposition 2", "transposition 3", "transposition 4", "carving 1", "carving 2", "carving 3", "carving 4", "probability 1", "probability 2", "probability 3", "probability 4"}
+    default_exclusions = {"pset_seq_enabled","pset_seq_mode","load_pset", "pset_exclusion_first", "pset_exclusion_last", "current gate step 1", "current gate step 2", "current gate step 3", "current gate step 4", "offset 1", "offset 2", "offset 3", "offset 4", "transposition 1", "transposition 2", "transposition 3", "transposition 4", "carving 1", "carving 2", "carving 3", "carving 4", "probability 1", "probability 2", "probability 3", "probability 4", "key", "midi channel 1", "midi channel 2", "midi channel 3", "midi channel 4", "global clock div"}
   end
   pset_seq.set_save_paramlist(default_exclusions, false)
 
