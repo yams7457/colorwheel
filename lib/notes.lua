@@ -234,7 +234,7 @@ function jf_player:play_note(note, vel, length, channel, track)
   local v8 = (note - 60)/12
   local v_vel = (vel/127) * 5
   if params:get("jf/style") == JF_SUSTAIN_MONO then
-    crow.ii.jf.play_voice(track, v8 - 12, v_vel)
+    crow.ii.jf.play_voice(track, v8, v_vel)
     local index = self.channel_map[track] + 1
     self.channel_map[track] = index
     clock.run(function() 
@@ -247,7 +247,7 @@ function jf_player:play_note(note, vel, length, channel, track)
     local slot = self.allocator:get()
     local index = self.channel_map[slot.id] + 1
     self.channel_map[slot.id] = index
-    crow.ii.jf.play_voice(slot.id, v8 - 12, v_vel)
+    crow.ii.jf.play_voice(slot.id, v8, v_vel)
     slot.on_release = function(slot)
       if self.channel_map[slot.id] == index then
         crow.ii.jf.trigger(slot.id, 0)
