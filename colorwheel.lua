@@ -288,11 +288,8 @@ function randomize()
   for j = 1,16,1 do
       params:set("gate " ..i .." "..j, math.random(0,1))
       params:set("interval " ..i .." "..j, math.random (1, 5))
-      params:set("alt note " ..i .." " ..j, math.random(0,4))
       params:set("velocity " ..i .." "..j, math.random(2, 5))
       params:set("length " ..i .." "..j, math.random(1,5))
-      params:set("alt note " ..i .." "..j, math.random(0,4))
-      params:set("octave " ..i .." "..j, math.random(1,2))
   end  
       params:set("gate " ..i .." 1", 1)
 
