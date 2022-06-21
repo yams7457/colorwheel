@@ -247,7 +247,7 @@ pset_seq.init = function (pset_exclusion_tables, pset_exclusion_table_labels)
   params:add_number("pset_exclusion_first", "first", 1, pset_seq.get_num_psets(), 1)
   params:set_action("pset_exclusion_first", function(val) 
     set_pset_exclusion_first(val)
-    set_pset_exclusion_lfast()
+    set_pset_exclusion_last()
   end )
   
 
