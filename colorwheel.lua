@@ -8,6 +8,7 @@
 -- if you get the spins
 
 include 'lib/notes'
+include 'lib/mididelay'
 include 'lib/algebra'
 lattice = require("lattice")
 include 'lib/pset_sequencer'
@@ -87,13 +88,13 @@ function init()
 
 
   end
-  
+
   midi_delay_clock = colorwheel_lattice:new_pattern{
     action = function(t) delay_tick() end,
     division = params:get("global clock div") / 8
-    
+
   }
-  
+
   -- start the lattice
   colorwheel_lattice:start()
 
@@ -290,7 +291,7 @@ end
 
 function randomize()
   transposition_center = math.random(-2,2)
-  -- for i = 1,4,1 do
+  for i = 1,4,1 do
   --   for key,value in pairs(note_traits.current) do
   --     params:set(key.. " sequence end " ..i, math.random(1,16))
   --     params:set(key.. " div " ..i, math.random(1,5))
@@ -310,6 +311,7 @@ function randomize()
       params:set("gate " ..i .." 1", 1)
 
   end
+
 end
 
 function key(n,z)
@@ -876,7 +878,7 @@ function set_up_the_prob_page(trait, track)
 end
 
 function set_up_the_gate_clock_page()
-  if not momentary_prob then 
+  if not momentary_prob then
     for y = 1,4 do
       g:led(params:get('gate div ' ..y), y, 8)
     end
@@ -891,7 +893,7 @@ function set_up_the_gate_clock_page()
       end
       for x = 13,16 do
         g:led(x,6, 2)
-      end  
+      end
     for output_track = 1,4 do
       g:led((output_track - 1) * 4 + params:get("output slot " ..output_track), 6, 12)
     end
