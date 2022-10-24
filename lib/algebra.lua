@@ -1,7 +1,7 @@
 music_util = require("musicutil")
 
 velocity_values = { 0, 32, 64, 96, 127 }
-length_values = {.25, .5, 1, 2, 4}
+length_values = {.5, 1, 2, 4, 6}
 
 note_traits = {
   ["current"] = {
@@ -87,14 +87,15 @@ queue_add_param{ type = "number", id = "offset mode", name = "offset mode", min 
 queue_add_param{ type = "number", id = "Bernoulli chance", name = "Bernoulli Chance", min = 0, max = 100, default = 50 }
 for i = 1,4,1
   do
-queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = 1 }
+queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = i }
 end
   dequeue_param_group("meta")
 
 for i = 1,4,1 do
     queue_add_param{ type = "option", id = "output "..i, name = "output", options= VOICES, default=MIDI_VOICE}
+    queue_add_param{ type = "number", id = "output slot " ..i, name = "output slot " ..i, min = 1, max = 4, default = 1 }
     for key,value in pairs(note_traits.current) do
-        queue_add_param{ type = "number", id = key.. " div " ..i, name = key.. " div " ..i, min = 1, max = 16, default = 1}
+        queue_add_param{ type = "number", id = key.. " div " ..i, name = key.. " div " ..i, min = 1, max = 16, default = 4}
         queue_add_param{ type = "number", id = key.. " sequence start " ..i, name = key.. " sequence start " ..i, min = 1, max = 16, default = 1}
         queue_add_param{ type = "number", id = key.. " sequence end " ..i, name = key.. " sequence end " ..i, min = 1, max = 16, default = 6}
         queue_add_param{ type = "number", id = "current " ..key.. " step " ..i, name = "current " ..key.. " step " ..i, min = 1, max = 16, default = 1}
@@ -206,7 +207,9 @@ function trait_tick(a_trait, track, source_lattice, t)
             end
     params:set("current " .. a_trait .. " step " .. track, ((params:get("current " .. a_trait .. " step " .. track) - params:get(a_trait .. " sequence start " .. track)) + 1) % (params:get(a_trait .. " sequence end " .. track) - params:get(a_trait .. " sequence start " .. track) + 1) + params:get(a_trait .. " sequence start " .. track))
     grid_dirty = true
-    source_lattice:set_division(params:get(a_trait..  ' div ' ..track) * params:get("global clock div") / 32)
+    if t % (params:get(a_trait.. ' div ' ..track) * params:get("global clock div")) == 0 then
+      source_lattice:set_division(params:get(a_trait..  ' div ' ..track) * params:get("global clock div") / 32)
+    end
 end
 
 function determine_traits(track, flourish)
@@ -233,7 +236,7 @@ function determine_traits(track, flourish)
   note_traits.calculated.interval[track] = params:get("offset") + (params:get('key') + (collection_0[outer_index][inner_index]) + ( 7 * params:get("transposition " ..track))) % 12
   current_offset[track] = offset_list[params:get("offset mode")][params:get("offset " ..track)]
   current_note[track] = note_traits.calculated.interval[track] + octave * 12 + current_offset[track]
-  current_channel[track] = params:get("midi channel " ..track)
+  current_channel[track] = params:get("midi channel " .. params:get("output slot " ..track))
   for key,value in pairs(note_traits.current) do
       note_traits.previous[key][track] = note_traits.previous[key][track]
   end
@@ -252,7 +255,7 @@ end
 
 function play(note, vel, length, channel, track, flourish)
   if flourish or (math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 ) then
-    notes.play[params:get("output "..track)](note, vel, length, channel, track)
+    notes.play[params:get("output ".. params:get("output slot " ..track))](note, vel, length, channel, track)
     --print(note, vel, channel)
     end
     clock.run(note_off, note, vel, length, channel, track)
