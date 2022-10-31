@@ -185,9 +185,9 @@ m = midi.connect()
 
 function play_midi_note(note, vel, length, channel, track)
   m:note_on(note, vel, channel)
-  print('hell yeah!')
+  -- print('hell yeah!')
   if vel >= 1 then
-  add_note_to_delay(note, vel, length, channel, track)
+  -- add_note_to_delay(note, vel, length, channel, track)
   end
   clock.run(midi_note_off, note, vel, length, channel, track)
 end

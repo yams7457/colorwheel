@@ -88,12 +88,13 @@ queue_add_param{ type = "number", id = "Bernoulli chance", name = "Bernoulli Cha
 for i = 1,4,1
   do
 queue_add_param{ type = "number", id = "midi channel " ..i, name = "midi channel " ..i, min = 1, max = 16, default = i }
+queue_add_param{ type = "number", id = "flourish " ..i, name = "flourish " ..i, min = 0, max = 1, default = 0 }
 end
   dequeue_param_group("meta")
 
 for i = 1,4,1 do
     queue_add_param{ type = "option", id = "output "..i, name = "output", options= VOICES, default=MIDI_VOICE}
-    queue_add_param{ type = "number", id = "output slot " ..i, name = "output slot " ..i, min = 1, max = 4, default = 1 }
+    queue_add_param{ type = "number", id = "output slot " ..i, name = "output slot " ..i, min = 1, max = 4, default = i }
     for key,value in pairs(note_traits.current) do
         queue_add_param{ type = "number", id = key.. " div " ..i, name = key.. " div " ..i, min = 1, max = 16, default = 4}
         queue_add_param{ type = "number", id = key.. " sequence start " ..i, name = key.. " sequence start " ..i, min = 1, max = 16, default = 1}
@@ -240,7 +241,11 @@ function determine_traits(track, flourish)
   for key,value in pairs(note_traits.current) do
       note_traits.previous[key][track] = note_traits.previous[key][track]
   end
-  play(current_note[track] + params:get("key"), velocity_values[velocity], length_values[length], current_channel[track], track, flourish)
+  -- if params:get("flourish " ..track) == 1 then
+    play(current_note[track] + params:get("key"), velocity_values[velocity], length_values[length], current_channel[track], track, flourish)
+  --   elseif params:get("flourish " ..track) == 0 then
+  --   play(current_note[track] + params:get("key"), velocity_values[velocity], length_values[length], current_channel[track], track, 0)
+  -- end
 end
 
 function check_step_probability(track)
@@ -268,6 +273,9 @@ end
 
 function offset_flourish(track)
   previous_offset[track] = params:get('offset ' ..track)
-  determine_traits(track, true)
+  if params:get("flourish " ..track) == 0 then
+  else
+    determine_traits(track, true)
+  end
   grid_dirty = true
 end

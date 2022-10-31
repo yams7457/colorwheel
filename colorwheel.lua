@@ -8,7 +8,7 @@
 -- if you get the spins
 
 include 'lib/notes'
-include 'lib/mididelay'
+-- include 'lib/mididelay'
 include 'lib/algebra'
 lattice = require("lattice")
 include 'lib/pset_sequencer'
@@ -89,11 +89,11 @@ function init()
 
   end
 
-  midi_delay_clock = colorwheel_lattice:new_pattern{
-    action = function(t) delay_tick() end,
-    division = params:get("global clock div") / 8
+  -- midi_delay_clock = colorwheel_lattice:new_pattern{
+  --   action = function(t) delay_tick() end,
+  --   division = params:get("global clock div") / 8
 
-  }
+  -- }
 
   -- start the lattice
   colorwheel_lattice:start()
@@ -517,69 +517,69 @@ end -- all seq stuff should be above this line
 
   end
 
-  if navigation_bar.sequence_or_live == 2 then
+  -- if navigation_bar.sequence_or_live == 2 then
 
-    if y == 8 and x == 14 and z == 1 then
-      if params:get("pset_seq_enabled") >= 2 then
-        params:set("pset_seq_enabled", 1)
-      else
-        params:set("pset_seq_enabled", 2)
-      end
-      end
+  --   if y == 8 and x == 14 and z == 1 then
+  --     if params:get("pset_seq_enabled") >= 2 then
+  --       params:set("pset_seq_enabled", 1)
+  --     else
+  --       params:set("pset_seq_enabled", 2)
+  --     end
+  --     end
 
-    if y == 8 and x == 10 then
-      write_preset = z
-    end
+  --   if y == 8 and x == 10 then
+  --     write_preset = z
+  --   end
 
-    if x >= 13 and y <= 6 and z == 1 then
-      if write_preset == 1 then
-        params:write((y - 1) * 4 + x - 12, ((y - 1) * 4 + x - 12))
-      else
-        if colorwheel_lattice.enabled then
-          change_preset = (y - 1) * 4 + x - 12
-          else params:set('load_pset', (y - 1) * 4 + x - 12)
-          create_the_collection()
-        end
-        print(params:get('load_pset'))
-      end
-    end
+  --   if x >= 13 and y <= 6 and z == 1 then
+  --     if write_preset == 1 then
+  --       params:write((y - 1) * 4 + x - 12, ((y - 1) * 4 + x - 12))
+  --     else
+  --       if colorwheel_lattice.enabled then
+  --         change_preset = (y - 1) * 4 + x - 12
+  --         else params:set('load_pset', (y - 1) * 4 + x - 12)
+  --         create_the_collection()
+  --       end
+  --       print(params:get('load_pset'))
+  --     end
+  --   end
 
-    if y == 7 then
-      params:set('pset_seq_beats', x)
-    end
+  --   if y == 7 then
+  --     params:set('pset_seq_beats', x)
+  --   end
 
-    if y == 8 and x <= 4 then
-      params:set('pset_seq_beats_per_bar', x)
-    end
+  --   if y == 8 and x <= 4 then
+  --     params:set('pset_seq_beats_per_bar', x)
+  --   end
 
-    if x <= 12 then
-    if y == 2 then
-      params:set("third", x - 1)
-      create_the_collection()
-    end
+  --   if x <= 12 then
+  --   if y == 2 then
+  --     params:set("third", x - 1)
+  --     create_the_collection()
+  --   end
 
-    if y == 3 then
-      params:set("sixth", x -1)
-      create_the_collection()
-    end
+  --   if y == 3 then
+  --     params:set("sixth", x -1)
+  --     create_the_collection()
+  --   end
 
-    if y == 4 then
-      params:set("second", x - 1)
-      create_the_collection()
-    end
+  --   if y == 4 then
+  --     params:set("second", x - 1)
+  --     create_the_collection()
+  --   end
 
-    if y == 5 then
-      params:set("fifth", x - 1)
-      create_the_collection()
-    end
+  --   if y == 5 then
+  --     params:set("fifth", x - 1)
+  --     create_the_collection()
+  --   end
 
-    if y == 6 then
-      params:set("root", x - 1)
-      create_the_collection()
-    end
-    end
+  --   if y == 6 then
+  --     params:set("root", x - 1)
+  --     create_the_collection()
+  --   end
+  --   end
 
-  end
+  -- end
 
 
     grid_dirty = true
